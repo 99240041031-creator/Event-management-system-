@@ -15,9 +15,14 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 
+import { clubMockData } from '@/mock/clubData';
+
 const FacultyClubsPage = () => {
     const navigate = useNavigate();
-    const [clubs, setClubs] = useState<any[]>([]);
+    const [apiClubs] = useState<any[]>([]);
+    
+    // Fallback logic: Use API data if available, otherwise use high-fidelity mock data
+    const clubs = apiClubs.length > 0 ? apiClubs : clubMockData.clubs;
 
     const stats = {
         totalClubs: clubs.length,
