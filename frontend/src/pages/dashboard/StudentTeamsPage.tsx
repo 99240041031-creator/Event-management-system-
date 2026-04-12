@@ -27,7 +27,7 @@ import {
     Zap
 } from 'lucide-react';
 
-const StudentTeamsDashboard = () => {
+const StudentTeamsPage = () => {
     const navigate = useNavigate();
     const { user } = useAuthStore();
     const [teams, setTeams] = useState<any[]>([]);
@@ -292,4 +292,4 @@ const StudentTeamsDashboard = () => {
     );
 };
 
-export default StudentTeamsDashboard;
+export default StudentTeamsPage;

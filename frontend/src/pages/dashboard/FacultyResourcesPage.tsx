@@ -43,70 +43,83 @@ const FacultyResourcesPage = () => {
         description: '',
         category: 'NOTES',
         visibility: 'PUBLIC',
-        fileUrl: '',
+        url: '',
     });
+
+    const cleanInput = (value: string) => {
+        return value.trim().replace(/^"|"$/g, "");
+    };
+
+    const normalizeUrl = (url: string) => {
+        let cleaned = url.trim().replace(/^"|"$/g, "");
+
+        // If no protocol → add https
+        if (!cleaned.startsWith("http://") && !cleaned.startsWith("https://")) {
+            if (cleaned.startsWith("www.")) {
+                cleaned = "https://" + cleaned;
+            }
+        }
+
+        return cleaned;
+    };
+
+    const isValidInput = (value: string) => {
+        const input = cleanInput(value);
+        if (!input) return false;
+
+        // Allow URLs
+        try {
+            new URL(input);
+            return true;
+        } catch { }
+
+        // Allow local paths (Windows)
+        const windowsPathRegex = /^[a-zA-Z]:\\.*$/;
+        if (windowsPathRegex.test(input)) {
+            return true;
+        }
+
+        return false;
+    };
 
     useEffect(() => {
         loadResources();
     }, []);
 
-    const loadResources = async () => {
+    const loadResources = () => {
         try {
-            const data = await facultyApi.getResources();
+            const data = JSON.parse(localStorage.getItem("resources") || "[]");
             setResources(data || []);
         } catch (error) {
             console.error('Failed to load resources:', error);
-            // toast.error('Failed to load resources');
         }
     };
 
-    const handleUpload = async () => {
-        if (!uploadForm.title || !uploadForm.fileUrl) {
-            toast.error('Please fill in all required fields');
+    const handleUpload = () => {
+        const cleanedUrl = cleanInput(uploadForm.url);
+
+        if (!uploadForm.title || !cleanedUrl) {
+            toast.error('Please enter a title and URL/Path');
+            return;
+        }
+
+        if (!isValidInput(cleanedUrl)) {
+            toast.error("Please enter a valid URL or local file path (e.g., C:\\path\\to\\file)");
             return;
         }
 
         try {
-            // Create FormData object
-            const formData = new FormData();
-            formData.append('title', uploadForm.title);
-            formData.append('description', uploadForm.description);
-            formData.append('category', uploadForm.category);
-            formData.append('visibility', uploadForm.visibility);
+            const newResource = {
+                id: Date.now(),
+                ...uploadForm,
+                url: cleanedUrl,
+                downloads: 0,
+                views: 0
+            };
 
-            // Note: In a real file upload, we would append the file object.
-            // Since this is a URL-based resource for now (based on UI), or if we are mocking file upload with URL:
-            formData.append('fileUrl', uploadForm.fileUrl);
-            // If the backend expects a file, we can't upload a URL as a file easily without downloading it first.
-            // Assuming the backend supports both or we are just sending metadata + url.
-            // If the backend expects a MultipartFile, we need an actual file input in the UI.
-            // The current UI shows 'File URL' input.
-            // So we might need to send this as JSON, NOT FormData, unless the backend handles URL upload via multipart.
-
-            // RE-EVALUATIION: If the UI has "File URL" input, it's not a file upload. It's a link resource.
-            // In that case, we should send JSON.
-            // Let's assume for now we send JSON for URL resources.
-            // If we want file upload, we need <input type="file">.
-
-            // Changing strategy: If UI input is URL, use JSON endpoint or assume backend accepts JSON for URL resources.
-            // Checking backend: @PostMapping("/resources/upload") usually implies file.
-            // But if the user inputs a URL, it's a "Link" resource.
-            // Let's assume we send JSON.
-
-            // To be safe, I'll send it as JSON since the UI asks for "File URL".
-            // So I DON'T need FormData for this specific UI implementation.
-            // But I updated fetchAPI already, which is fine.
-
-            await api.post('/faculty/resources', uploadForm); // Assuming a JSON endpoint exists or create one.
-            // Wait, I added uploadResource using FormData.
-            // If I want to support URL resources, I should probably use a different endpoint or send as JSON.
-            // The existing `uploadResource` in api.ts expects FormData.
-
-            // Let's try to send as JSON to `uploadResource` if I modify api.ts or just call api.post directly here.
-
-            await api.post('/faculty/resources', {
-                ...uploadForm
-            });
+            const existing = JSON.parse(localStorage.getItem("resources") || "[]");
+            const updated = [...existing, newResource];
+            localStorage.setItem("resources", JSON.stringify(updated));
 
             toast.success('Resource uploaded successfully');
             setIsUploadOpen(false);
@@ -115,25 +128,51 @@ const FacultyResourcesPage = () => {
                 description: '',
                 category: 'NOTES',
                 visibility: 'PUBLIC',
-                fileUrl: '',
+                url: '',
             });
             loadResources();
-        } catch (error) {
-            console.error('Failed to upload resource:', error);
-            toast.error('Failed to upload resource');
+        } catch (error: any) {
+            console.error('Upload failed:', error);
+            toast.error('Upload failed');
         }
     };
 
-    const handleDelete = async (id: string) => {
+    const handleDelete = (id: number) => {
         if (!confirm('Are you sure you want to delete this resource?')) return;
 
         try {
-            await facultyApi.deleteResource(id);
+            const data = JSON.parse(localStorage.getItem("resources") || "[]");
+            const updated = data.filter((r: any) => r.id !== id);
+            localStorage.setItem("resources", JSON.stringify(updated));
             toast.success('Resource deleted successfully');
             loadResources();
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to delete resource:', error);
             toast.error('Failed to delete resource');
+        }
+    };
+
+    const handleView = (url: string) => {
+        if (!url) {
+            alert("Invalid resource link");
+            return;
+        }
+
+        const cleaned = url.trim().replace(/^"|"$/g, "");
+        console.log("Viewing resource:", cleaned);
+
+        // LOCAL FILE (CANNOT OPEN DIRECTLY)
+        if (/^[a-zA-Z]:\\/.test(cleaned)) {
+            alert("Local files cannot be opened directly due to browser security. Please upload the file to Google Drive/YouTube and use that link instead.");
+            return;
+        }
+
+        // NORMAL URL (Normalize if needed)
+        const normalized = normalizeUrl(cleaned);
+        const newWindow = window.open(normalized, "_blank");
+
+        if (!newWindow) {
+            alert("Popup blocked or invalid URL");
         }
     };
 
@@ -231,21 +270,24 @@ const FacultyResourcesPage = () => {
                                 </Select>
                             </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="fileUrl">File URL *</Label>
+                              <div className="space-y-2">
+                                <Label htmlFor="url">Online Resource Link *</Label>
                                 <Input
-                                    id="fileUrl"
-                                    value={uploadForm.fileUrl}
-                                    onChange={(e) => setUploadForm({ ...uploadForm, fileUrl: e.target.value })}
-                                    placeholder="https://example.com/file.pdf"
+                                    id="url"
+                                    value={uploadForm.url}
+                                    onChange={(e) => setUploadForm({ ...uploadForm, url: e.target.value })}
+                                    placeholder="https://... (Drive, YouTube, etc.)"
                                 />
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    Local file paths (C:\) are blocked by browsers. Use online links only for reliable access.
+                                </p>
                             </div>
 
                             <div className="flex gap-3">
                                 <Button variant="outline" onClick={() => setIsUploadOpen(false)} className="flex-1">
                                     Cancel
                                 </Button>
-                                <Button onClick={handleUpload} className="flex-1">
+                                 <Button onClick={handleUpload} className="flex-1">
                                     <Upload className="mr-2 h-4 w-4" /> Upload
                                 </Button>
                             </div>
@@ -320,11 +362,8 @@ const FacultyResourcesPage = () => {
                                     <span>{resource.views || 0} views</span>
                                 </div>
                                 <div className="flex gap-2">
-                                    <Button variant="outline" size="sm" className="flex-1">
+                                    <Button variant="outline" size="sm" className="flex-1" onClick={() => handleView(resource.url)}>
                                         <Eye className="mr-1 h-4 w-4" /> View
-                                    </Button>
-                                    <Button variant="outline" size="sm">
-                                        <Download className="h-4 w-4" />
                                     </Button>
                                     <Button variant="destructive" size="sm" onClick={() => handleDelete(resource.id)}>
                                         <Trash2 className="h-4 w-4" />

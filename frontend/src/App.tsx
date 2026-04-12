@@ -30,7 +30,6 @@ import StudentDashboard from '@/pages/dashboard/StudentDashboard';
 import MyHackathonsPage from '@/pages/dashboard/MyHackathonsPage';
 import StudentHackathonDetailPage from '@/pages/dashboard/HackathonDetailPage';
 import StudentEventsDashboard from '@/pages/dashboard/StudentEventsDashboard';
-import StudentTeamsDashboard from '@/pages/dashboard/StudentTeamsDashboard';
 import TeamDetailsPage from '@/pages/dashboard/team/TeamDetailsPage';
 import StudentAnalyticsDashboard from '@/pages/dashboard/StudentAnalyticsDashboard';
 import FacultyDashboard from '@/pages/dashboard/FacultyDashboard';
@@ -43,6 +42,7 @@ import FacultyHackathonCreatePage from '@/pages/dashboard/FacultyHackathonCreate
 import FacultyAnalyticsDashboard from '@/pages/dashboard/FacultyAnalyticsDashboard';
 import FacultyStudentManagement from '@/pages/dashboard/FacultyStudentManagement';
 import FacultyResourcesPage from '@/pages/dashboard/FacultyResourcesPage';
+import TeamsPage from '@/pages/dashboard/TeamsPage';
 import FacultyWebinarsPage from '@/pages/dashboard/FacultyWebinarsPage';
 import FacultyClubsPage from '@/pages/dashboard/FacultyClubsPage';
 import FacultyCertificatesPage from '@/pages/dashboard/FacultyCertificatesPage';
@@ -74,6 +74,8 @@ import AssignedEvents from '@/pages/dashboard/AssignedEvents';
 import HodScoresPage from '@/pages/dashboard/HodScoresPage';
 
 import JudgeManagement from '@/pages/dashboard/JudgeManagement';
+import JudgeTeamDetails from '@/pages/dashboard/JudgeTeamDetails';
+import JudgeEvaluationPage from '@/pages/dashboard/JudgeEvaluationPage';
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) => {
@@ -187,7 +189,7 @@ function App() {
             <Route path="/dashboard/student/my-hackathons" element={<MyHackathonsPage />} />
             <Route path="/dashboard/student/my-hackathons/:id" element={<StudentHackathonDetailPage />} />
             <Route path="/dashboard/student/events" element={<StudentEventsDashboard />} />
-            <Route path="/dashboard/student/teams" element={<StudentTeamsDashboard />} />
+            <Route path="/dashboard/teams" element={<TeamsPage />} />
             <Route path="/dashboard/student/team/:id" element={<TeamDetailsPage />} />
             <Route path="/dashboard/student/analytics" element={<StudentAnalyticsDashboard />} />
             <Route path="/dashboard/student/resources" element={<ResourcesPage />} />
@@ -224,8 +226,10 @@ function App() {
             <Route path="/dashboard/hod/judges" element={<JudgeManagement />} />
             <Route path="/dashboard/dean" element={<DeanDashboard />} />
             <Route path="/dashboard/judge" element={<JudgeDashboard />} />
+            <Route path="/dashboard/judge/evaluate" element={<JudgeEvaluationPage />} />
             <Route path="/dashboard/judge/events" element={<AssignedEvents />} />
             <Route path="/dashboard/judge/events/:eventId" element={<JudgeEventDetails />} />
+            <Route path="/judge/team/:teamId" element={<JudgeTeamDetails />} />
             <Route path="/dashboard/judge/evaluate/:submissionId" element={<EvaluationPage />} />
 
             {/* Club Routes */}
