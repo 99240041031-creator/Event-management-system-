@@ -37,7 +37,8 @@ import { Button } from '@/components/ui/button';
 import { Monitor, BarChart } from 'lucide-react';
 
 const getMenuItems = (role: string) => {
-  switch (role) {
+  const normalizedRole = role.toLowerCase();
+  switch (normalizedRole) {
     case 'super_admin':
       return [
         { name: 'University Control', href: '/dashboard/super-admin', icon: Building2 },
@@ -85,19 +86,24 @@ const getMenuItems = (role: string) => {
         { name: 'Start Event', href: '/dashboard/faculty/start', icon: PlayCircle },
         { name: 'Resources', href: '/dashboard/faculty/resources', icon: FolderOpen },
         { name: 'Students', href: '/dashboard/faculty/students', icon: GraduationCap },
+        { name: 'Teams', href: '/dashboard/teams', icon: Users },
         { name: 'Analytics', href: '/dashboard/faculty/analytics', icon: BarChart3 },
         { name: 'Reports', href: '/dashboard/faculty/reports', icon: FileText },
       ];
     case 'judge':
+    case 'director':
       return [
         { name: 'Dashboard', href: '/dashboard/judge', icon: LayoutDashboard },
+        { name: 'Evaluate Teams', href: '/dashboard/judge/evaluate', icon: ClipboardList },
         { name: 'My Events', href: '/dashboard/judge/events', icon: Calendar },
+        { name: 'Leaderboard', href: '/dashboard/student/leaderboard', icon: Trophy },
+        { name: 'Clubs', href: '/dashboard/student/clubs', icon: Users },
       ];
     case 'student':
     default:
       return [
         { name: 'My Events', href: '/dashboard/student', icon: Calendar },
-        { name: 'My Teams', href: '/dashboard/student/teams', icon: Users },
+        { name: 'My Teams', href: '/dashboard/teams', icon: Users },
         { name: 'Certificates', href: '/dashboard/student/certificates', icon: Award },
         { name: 'Leaderboard', href: '/dashboard/student/leaderboard', icon: Trophy },
         { name: 'Clubs', href: '/dashboard/student/clubs', icon: Users },
@@ -111,6 +117,8 @@ const DashboardSidebar = () => {
   const location = useLocation();
 
   if (!user) return null;
+
+  console.log("CURRENT ROLE:", user.role);
 
   const menuItems = getMenuItems(user.role);
 
@@ -164,7 +172,16 @@ const DashboardSidebar = () => {
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto p-3">
             <ul className="space-y-1">
-              {menuItems.map((item) => (
+              {menuItems
+                .filter(item => {
+                  const role = user.role.toLowerCase();
+                  const isEvalRole = role === 'judge' || role === 'director';
+                  if (isEvalRole) {
+                    return item.name !== 'My Teams' && item.name !== 'Certificates';
+                  }
+                  return true;
+                })
+                .map((item) => (
                 <li key={item.name}>
                   <Link
                     to={item.href}

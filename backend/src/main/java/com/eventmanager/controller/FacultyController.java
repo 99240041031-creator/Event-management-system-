@@ -287,7 +287,7 @@ public class FacultyController {
         List<String> userIds = request.get("userIds");
         
         facultyService.markAttendance(id, userIds, facultyId);
-        auditLogService.log("MARK_ATTENDANCE", "EVENT", Long.parseLong(id), 
+        auditLogService.log("MARK_ATTENDANCE", "EVENT", id, 
             "Marked attendance for " + userIds.size() + " users", httpRequest);
         
         return ResponseEntity.ok(ApiResponse.success("Attendance marked successfully"));
@@ -347,7 +347,7 @@ public class FacultyController {
         String facultyId = ((CustomUserDetails) authentication.getPrincipal()).getUser().getId();
         
         facultyService.scoreSubmission(id, scoreData, facultyId);
-        auditLogService.log("SCORE_SUBMISSION", "HACKATHON", Long.parseLong(id), 
+        auditLogService.log("SCORE_SUBMISSION", "HACKATHON", id, 
             "Scored submission", httpRequest);
         
         return ResponseEntity.ok(ApiResponse.success("Submission scored successfully"));
@@ -379,7 +379,7 @@ public class FacultyController {
         List<String> userIds = (List<String>) request.get("userIds");
         
         facultyService.generateCertificates(eventId, userIds, facultyId);
-        auditLogService.log("GENERATE_CERTIFICATES", "EVENT", Long.parseLong(eventId), 
+        auditLogService.log("GENERATE_CERTIFICATES", "EVENT", eventId, 
             "Generated " + userIds.size() + " certificates", httpRequest);
         
         return ResponseEntity.ok(ApiResponse.success("Certificates generated successfully"));
@@ -410,9 +410,18 @@ public class FacultyController {
         String facultyId = ((CustomUserDetails) authentication.getPrincipal()).getUser().getId();
         
         facultyService.revokeCertificate(id, facultyId);
-        auditLogService.log("REVOKE_CERTIFICATE", "CERTIFICATE", Long.parseLong(id), 
+        auditLogService.log("REVOKE_CERTIFICATE", "CERTIFICATE", id, 
             "Revoked certificate", httpRequest);
         
         return ResponseEntity.ok(ApiResponse.success("Certificate revoked successfully"));
+    }
+    /**
+     * Get faculty teams
+     */
+    @GetMapping("/teams")
+    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getFacultyTeams(Authentication authentication) {
+        String facultyId = ((CustomUserDetails) authentication.getPrincipal()).getUser().getId();
+        List<Map<String, Object>> teams = facultyService.getFacultyTeams(facultyId);
+        return ResponseEntity.ok(ApiResponse.success(teams));
     }
 }
