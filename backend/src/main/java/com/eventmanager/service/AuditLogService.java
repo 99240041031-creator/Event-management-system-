@@ -22,7 +22,7 @@ public class AuditLogService {
     
     @Async
     @Transactional
-    public void log(String action, String entityType, Long entityId, String details, HttpServletRequest request) {
+    public void log(String action, String entityType, String entityId, String details, HttpServletRequest request) {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             
@@ -54,7 +54,7 @@ public class AuditLogService {
     
     @Async
     @Transactional
-    public void logFailure(String action, String entityType, Long entityId, String errorMessage, HttpServletRequest request) {
+    public void logFailure(String action, String entityType, String entityId, String errorMessage, HttpServletRequest request) {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             
@@ -85,7 +85,7 @@ public class AuditLogService {
         return auditLogRepository.findAll(pageable);
     }
     
-    public Page<AuditLog> getLogsByUser(Long userId, Pageable pageable) {
+    public Page<AuditLog> getLogsByUser(String userId, Pageable pageable) {
         return auditLogRepository.findByUserIdOrderByTimestampDesc(userId, pageable);
     }
     
@@ -103,5 +103,28 @@ public class AuditLogService {
             return xForwardedFor.split(",")[0].trim();
         }
         return request.getRemoteAddr();
+    }
+
+    @Async
+    @Transactional
+    public void log(String action, String details, com.eventmanager.model.User actor, String entityType, String entityId) {
+        try {
+            AuditLog log = new AuditLog();
+            log.setAction(action);
+            log.setEntityType(entityType);
+            log.setEntityId(entityId);
+            log.setDetails(details);
+            log.setStatus("SUCCESS");
+            
+            if (actor != null) {
+                log.setUsername(actor.getName() != null ? actor.getName() : actor.getEmail());
+                log.setUserRole(actor.getRole() != null ? actor.getRole() : "UNKNOWN");
+                log.setUserId(actor.getId());
+            }
+            
+            auditLogRepository.save(log);
+        } catch (Exception e) {
+            System.err.println("Failed to create audit log: " + e.getMessage());
+        }
     }
 }

@@ -73,6 +73,12 @@ import EvaluationPage from '@/pages/dashboard/EvaluationPage';
 import AssignedEvents from '@/pages/dashboard/AssignedEvents';
 import HodScoresPage from '@/pages/dashboard/HodScoresPage';
 
+import HodApprovals from '@/pages/dashboard/hod/HodApprovals';
+import HodFacultyStatus from '@/pages/dashboard/hod/HodFacultyStatus';
+import HodStudentStatus from '@/pages/dashboard/hod/HodStudentStatus';
+import HodSyllabusTracking from '@/pages/dashboard/hod/HodSyllabusTracking';
+import HodCreditManager from '@/pages/dashboard/hod/HodCreditManager';
+
 import JudgeManagement from '@/pages/dashboard/JudgeManagement';
 
 // Protected Route Component
@@ -98,8 +104,9 @@ const DashboardRedirect = () => {
 
   // Prioritize Sub-Roles for specific dashboards
   if (user.subRole) {
-    switch (user.subRole) {
+    switch (user.subRole.toLowerCase()) {
       case 'hod':
+      case 'director':
         return <Navigate to="/dashboard/hod" replace />;
       case 'college_admin':
         return <Navigate to="/dashboard/college-admin" replace />;
@@ -119,7 +126,7 @@ const DashboardRedirect = () => {
   }
 
   // Fallback to Primary Role if subRole is missing or didn't match specific dashboard
-  switch (user.role) {
+  switch (user.role.toLowerCase()) {
     case 'super_admin':
       return <Navigate to="/dashboard/super-admin" replace />;
     case 'dean_of_campus':
@@ -127,6 +134,7 @@ const DashboardRedirect = () => {
     case 'college_admin':
       return <Navigate to="/dashboard/college-admin" replace />;
     case 'hod':
+    case 'director':
       return <Navigate to="/dashboard/hod" replace />;
     case 'faculty_coordinator':
       return <Navigate to="/dashboard/coordinator" replace />;
@@ -220,6 +228,11 @@ function App() {
             <Route path="/dashboard/college-admin/webinars/edit/:id" element={<CreateWebinarPage />} />
             <Route path="/dashboard/super-admin" element={<SuperAdminDashboard />} />
             <Route path="/dashboard/hod" element={<HodDashboard />} />
+            <Route path="/dashboard/hod/approvals" element={<HodApprovals />} />
+            <Route path="/dashboard/hod/faculty" element={<HodFacultyStatus />} />
+            <Route path="/dashboard/hod/students" element={<HodStudentStatus />} />
+            <Route path="/dashboard/hod/syllabus" element={<HodSyllabusTracking />} />
+            <Route path="/dashboard/hod/credits" element={<HodCreditManager />} />
             <Route path="/dashboard/hod/scores/:eventId" element={<HodScoresPage />} />
             <Route path="/dashboard/hod/judges" element={<JudgeManagement />} />
             <Route path="/dashboard/dean" element={<DeanDashboard />} />

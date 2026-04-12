@@ -125,6 +125,7 @@ public class DataSeeder implements CommandLineRunner {
             judge.setStreak(15);
             judge.setAvatar("https://api.dicebear.com/7.x/avataaars/svg?seed=David");
             userRepository.save(judge);
+
         } else {
             student = userRepository.findByEmail("student@college.edu").orElse(null);
             faculty = userRepository.findByEmail("faculty@college.edu").orElse(null);
@@ -135,6 +136,21 @@ public class DataSeeder implements CommandLineRunner {
                 student = userRepository.findAll().stream()
                     .filter(u -> "student".equals(u.getRole())).findFirst().orElse(null);
             }
+        }
+        
+        if (userRepository.findByEmail("director@college.edu").isEmpty()) {
+            // 6. Director GOPI
+            User director = new User();
+            director.setName("GOPI g");
+            director.setEmail("director@college.edu");
+            director.setPassword(new BCryptPasswordEncoder().encode("password"));
+            director.setRole("director");
+            director.setSubRole("director");
+            director.setCollege(c1);
+            director.setPoints(3000);
+            director.setStreak(50);
+            director.setAvatar("https://api.dicebear.com/7.x/avataaars/svg?seed=Director");
+            userRepository.save(director);
         }
 
         if (hackathonRepository.count() == 0) {

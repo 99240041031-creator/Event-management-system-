@@ -287,8 +287,8 @@ public class FacultyController {
         List<String> userIds = request.get("userIds");
         
         facultyService.markAttendance(id, userIds, facultyId);
-        auditLogService.log("MARK_ATTENDANCE", "EVENT", Long.parseLong(id), 
-            "Marked attendance for " + userIds.size() + " users", httpRequest);
+        auditLogService.log("MARK_ATTENDANCE", "EVENT", id, 
+            "Faculty marked attendance for event: " + id, httpRequest);
         
         return ResponseEntity.ok(ApiResponse.success("Attendance marked successfully"));
     }
@@ -347,8 +347,8 @@ public class FacultyController {
         String facultyId = ((CustomUserDetails) authentication.getPrincipal()).getUser().getId();
         
         facultyService.scoreSubmission(id, scoreData, facultyId);
-        auditLogService.log("SCORE_SUBMISSION", "HACKATHON", Long.parseLong(id), 
-            "Scored submission", httpRequest);
+        auditLogService.log("SCORE_SUBMISSION", "HACKATHON", id, 
+            "Faculty submitted scores for hackathon team: " + id, httpRequest);
         
         return ResponseEntity.ok(ApiResponse.success("Submission scored successfully"));
     }
@@ -379,8 +379,8 @@ public class FacultyController {
         List<String> userIds = (List<String>) request.get("userIds");
         
         facultyService.generateCertificates(eventId, userIds, facultyId);
-        auditLogService.log("GENERATE_CERTIFICATES", "EVENT", Long.parseLong(eventId), 
-            "Generated " + userIds.size() + " certificates", httpRequest);
+        auditLogService.log("GENERATE_CERTIFICATES", "EVENT", eventId, 
+            "Faculty generated certificates for event: " + eventId, httpRequest);
         
         return ResponseEntity.ok(ApiResponse.success("Certificates generated successfully"));
     }
@@ -410,8 +410,8 @@ public class FacultyController {
         String facultyId = ((CustomUserDetails) authentication.getPrincipal()).getUser().getId();
         
         facultyService.revokeCertificate(id, facultyId);
-        auditLogService.log("REVOKE_CERTIFICATE", "CERTIFICATE", Long.parseLong(id), 
-            "Revoked certificate", httpRequest);
+        auditLogService.log("REVOKE_CERTIFICATE", "CERTIFICATE", id, 
+            "Faculty revoked certificate: " + id, httpRequest);
         
         return ResponseEntity.ok(ApiResponse.success("Certificate revoked successfully"));
     }

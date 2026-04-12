@@ -1,4 +1,9 @@
 import { api } from '@/lib/api';
+import { MOCK_CONFIG } from '@/config/mockConfig';
+import { mockData } from '@/constants/mockData';
+import { toNumericId } from '@/utils/idUtils';
+
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export interface JudgeStats {
     assignedEvents: number;
@@ -23,31 +28,38 @@ export const judgeService = {
     },
 
     getEventSubmissions: async (eventId: string) => {
-        return await api.get<any[]>(`/submissions/event/${eventId}`);
+        return await api.get<any[]>(`/submissions/event/${toNumericId(eventId)}`);
     },
 
     submitEvaluation: async (submissionId: string, payload: EvaluationPayload) => {
-        return await api.post<any>(`/evaluation/submit/${submissionId}`, payload);
+        return await api.post<any>(`/evaluation/submit/${toNumericId(submissionId)}`, payload);
     },
 
     getSubmissionScore: async (submissionId: string) => {
-        return await api.get<any>(`/evaluation/submission/${submissionId}`);
+        return await api.get<any>(`/evaluation/submission/${toNumericId(submissionId)}`);
     },
 
     lockEventScores: async (eventId: string) => {
-        return await api.put<any>(`/evaluation/lock/${eventId}`, {});
+        return await api.put<any>(`/evaluation/lock/${toNumericId(eventId)}`, {});
     },
 
     getLockStatus: async (eventId: string) => {
-        return await api.get<boolean>(`/evaluation/lock/${eventId}/status`);
+        if (MOCK_CONFIG.USE_MOCK) {
+            return false;
+        }
+        return await api.get<boolean>(`/evaluation/lock/${toNumericId(eventId)}/status`);
     },
 
     getRubric: async (eventId: string) => {
-        return await api.get<any[]>(`/evaluation/rubric/${eventId}`);
+        return await api.get<any[]>(`/evaluation/rubric/${toNumericId(eventId)}`);
     },
 
     getPendingEvaluations: async (eventId: string) => {
-        return await api.get<any[]>(`/evaluation/pending/${eventId}`);
+        if (MOCK_CONFIG.USE_MOCK) {
+            await sleep(MOCK_CONFIG.DELAY_MS);
+            return mockData.evaluations;
+        }
+        return await api.get<any[]>(`/evaluation/pending/${toNumericId(eventId)}`);
     },
 
     getPendingSummary: async () => {
@@ -55,14 +67,18 @@ export const judgeService = {
     },
 
     getAvailableJudges: async () => {
+        if (MOCK_CONFIG.USE_MOCK) {
+            await sleep(MOCK_CONFIG.DELAY_MS);
+            return mockData.judges;
+        }
         return await api.get<any[]>('/evaluation/judges');
     },
 
     assignJudgeToEvent: async (eventId: string, judgeId: string) => {
-        return await api.post<any>(`/evaluation/assign/${eventId}?judgeId=${judgeId}`, {});
+        return await api.post<any>(`/evaluation/assign/${toNumericId(eventId)}?judgeId=${toNumericId(judgeId)}`, {});
     },
 
     getLeaderboard: async (eventId: string) => {
-        return await api.get<any[]>(`/evaluation/leaderboard/${eventId}`);
+        return await api.get<any[]>(`/evaluation/leaderboard/${toNumericId(eventId)}`);
     }
 };

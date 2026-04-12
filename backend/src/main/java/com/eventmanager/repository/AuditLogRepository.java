@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
     
-    Page<AuditLog> findByUserIdOrderByTimestampDesc(Long userId, Pageable pageable);
+    Page<AuditLog> findByUserIdOrderByTimestampDesc(String userId, Pageable pageable);
     
     Page<AuditLog> findByEntityTypeOrderByTimestampDesc(String entityType, Pageable pageable);
     
@@ -26,5 +26,5 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
     
     List<AuditLog> findTop100ByOrderByTimestampDesc();
     
-    long countByUserIdAndTimestampAfter(Long userId, LocalDateTime timestamp);
+    long countByUserIdAndTimestampAfter(String userId, LocalDateTime timestamp);
 }
