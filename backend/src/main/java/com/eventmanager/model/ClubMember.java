@@ -35,6 +35,9 @@ public class ClubMember {
     @Column(nullable = false)
     private MemberStatus status = MemberStatus.ACTIVE;
     
+    // New field for Club Management System
+    private Integer contributionScore = 0;
+    
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime joinedAt;

@@ -37,6 +37,17 @@ public class Club {
     private String bannerUrl;
     private String logoUrl;
 
+    // New fields for Club Management System
+    private Double performanceScore = 0.0;
+    private String status = "ACTIVE"; // PENDING, ACTIVE, SUSPENDED
+    private Boolean recruitmentOpen = false;
+
+    @Transient
+    private long memberCount;
+
+    @Transient
+    private long eventsCount;
+
     public String getName() {
         return name;
     }

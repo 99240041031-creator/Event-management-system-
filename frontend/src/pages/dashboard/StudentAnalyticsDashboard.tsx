@@ -16,7 +16,13 @@ import {
     Pie,
     Cell,
     AreaChart,
-    Area
+    Area,
+    RadarChart,
+    Radar,
+    PolarGrid,
+    PolarAngleAxis,
+    PolarRadiusAxis,
+    Legend,
 } from 'recharts';
 import { useAuthStore } from '@/store';
 import { analyticsApi } from '@/lib/api';
@@ -27,71 +33,95 @@ import {
     TrendingUp,
     Activity,
     Star,
-    Zap
+    Zap,
+    RefreshCw,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+
+const COLORS = ['hsl(173, 58%, 39%)', '#8884d8', '#ffc658', '#ff8042', '#00C49F'];
+
+const defaultData = {
+    eventsRegistered: 0,
+    hackathonsJoined: 0,
+    wins: 0,
+    certificatesEarned: 0,
+    totalPoints: 0,
+    rank: 0,
+    activityTrend: [
+        { month: 'Jan', points: 0, events: 0 },
+        { month: 'Feb', points: 0, events: 0 },
+        { month: 'Mar', points: 0, events: 0 },
+        { month: 'Apr', points: 0, events: 0 },
+        { month: 'May', points: 0, events: 0 },
+        { month: 'Jun', points: 0, events: 0 },
+    ],
+    clubParticipation: [],
+    skills: [
+        { subject: 'Coding', A: 0, fullMark: 150 },
+        { subject: 'Design', A: 0, fullMark: 150 },
+        { subject: 'Speaking', A: 0, fullMark: 150 },
+        { subject: 'Teamwork', A: 0, fullMark: 150 },
+        { subject: 'Leadership', A: 0, fullMark: 150 },
+    ],
+    rankingTrend: [
+        { month: 'Jan', rank: 100 },
+        { month: 'Feb', rank: 100 },
+        { month: 'Mar', rank: 100 },
+        { month: 'Apr', rank: 100 },
+        { month: 'May', rank: 100 },
+        { month: 'Jun', rank: 100 },
+    ],
+    upcomingCommitments: [],
+};
 
 const StudentAnalyticsDashboard = () => {
     const { user } = useAuthStore();
-    const [stats, setStats] = useState<any>(null);
+    const navigate = useNavigate();
+    const [stats, setStats] = useState<any>(defaultData);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
+
+    const fetchStats = async () => {
+        if (!user) return;
+        setLoading(true);
+        setError(false);
+        try {
+            const data = await analyticsApi.getStudentStats(user.id);
+
+            // Merge live data with defaults for graceful degradation
+            const merged = {
+                ...defaultData,
+                eventsRegistered: data.eventsRegistered ?? data.totalEvents ?? 0,
+                hackathonsJoined: data.hackathonsJoined ?? data.totalHackathons ?? 0,
+                wins: data.wins ?? data.podiums ?? 0,
+                certificatesEarned: data.certificatesEarned ?? data.totalCertificates ?? 0,
+                totalPoints: data.totalPoints ?? user.points ?? 0,
+                rank: data.rank ?? 0,
+                activityTrend: data.activityTrend ?? defaultData.activityTrend,
+                clubParticipation: data.clubParticipation ?? defaultData.clubParticipation,
+                skills: data.skills ?? defaultData.skills,
+                rankingTrend: data.rankingTrend ?? defaultData.rankingTrend,
+                upcomingCommitments: data.upcomingCommitments ?? defaultData.upcomingCommitments,
+            };
+            setStats(merged);
+        } catch (err) {
+            console.error('Failed to fetch analytics, using fallback data', err);
+            setError(true);
+            // Use user data as fallback
+            setStats({
+                ...defaultData,
+                totalPoints: user.points ?? 0,
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchStats = async () => {
-            if (!user) return;
-            try {
-                // Mock Data for sophisticated graphs
-                await new Promise(resolve => setTimeout(resolve, 1000));
-
-                const mockData = {
-                    eventsRegistered: 24,
-                    hackathonsJoined: 8,
-                    wins: 3,
-                    certificatesEarned: 12,
-                    totalPoints: 2450,
-                    rank: 42,
-
-                    // Specific Graph Data
-                    activityTrend: [
-                        { month: 'Jan', points: 120, events: 2 },
-                        { month: 'Feb', points: 300, events: 5 },
-                        { month: 'Mar', points: 250, events: 3 },
-                        { month: 'Apr', points: 450, events: 8 },
-                        { month: 'May', points: 380, events: 6 },
-                        { month: 'Jun', points: 500, events: 9 },
-                    ],
-
-                    clubParticipation: [
-                        { name: 'AI Club', value: 45 },
-                        { name: 'Robotics', value: 30 },
-                        { name: 'Debate', value: 15 },
-                        { name: 'Music', value: 10 },
-                    ],
-
-                    skills: [
-                        { subject: 'Coding', A: 120, fullMark: 150 },
-                        { subject: 'Design', A: 98, fullMark: 150 },
-                        { subject: 'Speaking', A: 86, fullMark: 150 },
-                        { subject: 'Teamwork', A: 99, fullMark: 150 },
-                        { subject: 'Leadership', A: 85, fullMark: 150 },
-                    ],
-
-                    upcomingCommitments: [
-                        { id: 1, title: 'Hackathon Finale', date: 'Tomorrow, 10:00 AM', type: 'High Priority' },
-                        { id: 2, title: 'AI Workshop', date: 'Fri, 2:00 PM', type: 'Learning' },
-                        { id: 3, title: 'Club Meeting', date: 'Sat, 5:00 PM', type: 'Routine' },
-                    ]
-                };
-                setStats(mockData);
-            } catch (error) {
-                console.error("Failed to fetch analytics", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchStats();
     }, [user]);
+
 
     if (loading) return (
         <div className="flex items-center justify-center h-[calc(100vh-200px)]">
@@ -102,16 +132,22 @@ const StudentAnalyticsDashboard = () => {
         </div>
     );
 
-    if (!stats) return <div>No analytics available</div>;
-
-    const COLORS = ['hsl(var(--teal))', '#8884d8', '#ffc658', '#ff8042'];
-
     return (
         <div className="space-y-8 pb-10">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight">Analytics Overview</h1>
-                <p className="text-muted-foreground">Detailed insights into your academic and extracurricular performance.</p>
+            <div className="flex items-start justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">Analytics Overview</h1>
+                    <p className="text-muted-foreground">Detailed insights into your academic and extracurricular performance.</p>
+                </div>
+                <Button variant="outline" size="sm" onClick={fetchStats} className="gap-2">
+                    <RefreshCw className="h-4 w-4" /> Refresh
+                </Button>
             </div>
+            {error && (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-900/10 p-3 text-sm text-amber-800 dark:text-amber-400">
+                    ⚠️ Live analytics unavailable — showing available data. Data will update when connection is restored.
+                </div>
+            )}
 
             {/* Key Metrics */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -281,6 +317,79 @@ const StudentAnalyticsDashboard = () => {
                     </CardContent>
                 </Card>
             </div>
+
+            {/* Skill Radar + Ranking Trend */}
+            <div className="grid gap-4 md:grid-cols-2">
+                <Card className="shadow-md">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <TrendingUp className="h-5 w-5 text-purple-500" /> Skill Dimensions
+                        </CardTitle>
+                        <CardDescription>Multi-axis performance overview</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="h-[280px]">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <RadarChart data={stats.skills}>
+                                    <PolarGrid stroke="hsl(var(--border))" />
+                                    <PolarAngleAxis dataKey="subject" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
+                                    <PolarRadiusAxis angle={90} domain={[0, 150]} tick={false} axisLine={false} />
+                                    <Radar name="Score" dataKey="A" stroke="hsl(173, 58%, 39%)" fill="hsl(173, 58%, 39%)" fillOpacity={0.3} />
+                                    <Legend />
+                                    <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }} />
+                                </RadarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card className="shadow-md">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Activity className="h-5 w-5 text-blue-500" /> Ranking History
+                        </CardTitle>
+                        <CardDescription>Campus rank over time (lower is better)</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="h-[280px]">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <LineChart data={stats.rankingTrend}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
+                                    <XAxis dataKey="month" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                                    <YAxis reversed stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                                    <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }} formatter={(val: any) => [`#${val}`, 'Rank']} />
+                                    <Line type="monotone" dataKey="rank" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4, fill: '#3b82f6' }} activeDot={{ r: 6 }} />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Monthly Participation Bar */}
+            <Card className="shadow-md">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Zap className="h-5 w-5 text-amber-500" /> Monthly Participation
+                    </CardTitle>
+                    <CardDescription>Events and points earned per month</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="h-[220px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={stats.activityTrend} barSize={24}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.2} />
+                                <XAxis dataKey="month" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                                <YAxis stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
+                                <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--background))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }} />
+                                <Legend />
+                                <Bar dataKey="events" fill="#3b82f6" name="Events" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="points" fill="hsl(173, 58%, 39%)" name="Points" radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     );
 };

@@ -34,8 +34,9 @@ public class ClubHeadAssignmentService {
         clubHeadAssignmentRepository.save(assignment);
 
         auditLogService.log("ASSIGN_CLUB_HEAD",
+                "Club", club.getId(),
                 "Faculty " + faculty.getEmail() + " assigned as head of club " + club.getName(),
-                actor, "Club", club.getId());
+                null);
     }
 
     public boolean isClubHead(User faculty, String clubId) {

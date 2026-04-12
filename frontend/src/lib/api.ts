@@ -287,6 +287,64 @@ export const clubApi = {
     getAnalytics: (id: string) => api.get<any>(`/clubs/${id}/analytics`),
 };
 
+// Faculty Club Management API
+export const facultyClubApi = {
+    // Club Overview
+    getClubs: () => api.get<any[]>('/faculty/clubs'),
+    getDetails: (clubId: string) => api.get<any>(`/faculty/clubs/${clubId}/overview`),
+    updateDetails: (clubId: string, data: any) => api.put<any>(`/faculty/clubs/${clubId}`, data),
+
+    // Recruitment
+    toggleRecruitment: (clubId: string, isOpen: boolean) => api.put<any>(`/faculty/clubs/${clubId}/recruitment`, { isOpen }),
+    getApplications: (clubId: string) => api.get<any[]>(`/faculty/clubs/${clubId}/applications`),
+    updateApplicationStatus: (id: string, status: string) => api.put<any>(`/faculty/applications/${id}`, { status }),
+    bulkApproveApplications: (requestIds: string[]) => api.post<any>('/faculty/applications/bulk-approve', { requestIds }),
+    updateJoinRequestScore: (id: string, score: number) => api.put<any>(`/faculty/applications/${id}/score`, { score }),
+
+    // Members
+    getMembers: (clubId: string) => api.get<any[]>(`/faculty/clubs/${clubId}/members`),
+    addMember: (clubId: string, userId: string, role: string) => api.post<any>(`/faculty/clubs/${clubId}/members`, { userId, role }),
+    removeMember: (clubId: string, userId: string) => api.delete<any>(`/faculty/clubs/${clubId}/members/${userId}`),
+    updateMemberRole: (clubId: string, userId: string, role: string) => api.put<any>(`/faculty/members/${userId}`, { role }),
+    exportMembers: (clubId: string) => api.get<any[]>(`/faculty/clubs/${clubId}/members/export`),
+
+    // Events
+    getEvents: (clubId: string) => api.get<any[]>(`/faculty/clubs/${clubId}/events`),
+    createEvent: (clubId: string, event: any) => api.post<any>(`/faculty/clubs/${clubId}/events`, event),
+    getEventParticipants: (eventId: string) => api.get<any[]>(`/faculty/events/${eventId}/participants`),
+    markAttendance: (eventId: string, studentId: string, status: string) => api.post<any>(`/faculty/clubs/events/${eventId}/attendance`, { studentId, status }),
+
+    // Hackathons
+    getHackathons: (clubId: string) => api.get<any[]>(`/faculty/clubs/${clubId}/hackathons`),
+    createHackathon: (clubId: string, hackathon: any) => api.post<any>(`/faculty/clubs/${clubId}/hackathons`, hackathon),
+
+    // Hackathon Teams & Scoring
+    getHackathonTeams: (hackathonId: string) => api.get<any[]>(`/faculty/hackathons/${hackathonId}/teams`),
+    registerHackathonTeam: (hackathonId: string, teamData: any) => api.post<any>(`/faculty/clubs/hackathons/${hackathonId}/teams`, teamData),
+    scoreTeam: (teamId: string, score: number, feedback: string) => api.post<any>(`/faculty/hackathons/teams/${teamId}/score`, { score, feedback }),
+    getLeaderboard: (hackathonId: string) =>
+        api.get(`/faculty/clubs/hackathons/${hackathonId}/leaderboard`),
+    // Posts
+    getPosts: (clubId: string) => api.get<any[]>(`/faculty/clubs/${clubId}/posts`),
+    createPost: (clubId: string, post: any) => api.post<any>(`/faculty/clubs/${clubId}/posts`, post),
+
+    // Budget
+    getBudget: (clubId: string) => api.get<any>(`/faculty/clubs/${clubId}/budget`),
+    updateBudget: (clubId: string, data: { allocated?: number; spent?: number; revenue?: number }) => api.post<any>(`/faculty/clubs/${clubId}/budget`, data),
+
+    // Analytics
+    getAnalytics: (clubId: string) => api.get<any>(`/faculty/clubs/${clubId}/analytics`),
+
+    // Certificates
+    generateCertificates: (clubId: string, eventId?: string) => api.post<any>(`/faculty/clubs/${clubId}/certificates/generate${eventId ? `?eventId=${eventId}` : ''}`, {}),
+    verifyCertificate: (certificateId: string) => api.get<any>(`/certificates/verify/${certificateId}`),
+    revokeCertificate: (id: string) => api.post<any>(`/faculty/clubs/certificates/${id}/revoke`, {}),
+
+    // Ambassadors
+    getAmbassadors: (clubId: string) => api.get<any[]>(`/faculty/clubs/${clubId}/ambassadors`),
+    addAmbassador: (clubId: string, userId: string) => api.post<any>(`/faculty/clubs/${clubId}/ambassadors`, { userId }),
+};
+
 export const eventTeamApi = {
     getAll: (eventId: string) => api.get<any[]>(`/events/${eventId}/team`),
     addMember: (eventId: string, data: { userId: string; role: string }) => api.post<any>(`/events/${eventId}/team`, data),
@@ -421,4 +479,25 @@ export const studentTeamApi = {
     submitProject: (id: string, data: any) => api.post<any>(`/student/team/${id}/submit`, data),
     chat: (id: string, userId: string, content: string, type: string = 'TEXT') =>
         api.post<any>(`/student/team/${id}/chat?userId=${userId}`, { content, type }),
+};
+
+export const ambassadorApi = {
+    getMetrics: () => api.get<any>('/ambassador/metrics'),
+    getCampaigns: () => api.get<any[]>('/ambassador/campaigns'),
+    getStudents: () => api.get<any[]>('/referrals/students'),
+    getRewardHistory: () => api.get<any[]>('/ambassador/rewards/history'),
+    getChatHistory: (roomId: string) => api.get<any[]>(`/ambassador/chat/messages/${roomId}`),
+    sendMessage: (roomId: string, content: string) => api.post<any>('/ambassador/chat/send', { roomId, content }),
+    createCampaign: (data: any) => api.post<any>('/ambassador/campaigns', data),
+    downloadCertificate: () => api.getBlob('/ambassador/certificate/download'),
+    
+    // New Upgraded Endpoints
+    getReferralFunnel: () => api.get<any>('/referrals/funnel'),
+    getReferralLink: () => api.get<any>('/referrals/link'),
+    getReferralQR: () => api.get<any>('/referrals/qr'),
+    getRewardBreakdown: () => api.get<any>('/rewards/breakdown'),
+    getFraudStatus: () => api.get<any>('/fraud/status'),
+    getRankingDetails: () => api.get<any>('/ranking/details'),
+    getNetworkGraph: () => api.get<any>('/network/graph'),
+    getEvents: () => api.get<any[]>('/ambassador/events'),
 };

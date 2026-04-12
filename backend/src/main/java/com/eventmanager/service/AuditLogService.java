@@ -22,7 +22,7 @@ public class AuditLogService {
     
     @Async
     @Transactional
-    public void log(String action, String entityType, Long entityId, String details, HttpServletRequest request) {
+    public void log(String action, String entityType, String entityId, String details, HttpServletRequest request) {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             
@@ -54,7 +54,7 @@ public class AuditLogService {
     
     @Async
     @Transactional
-    public void logFailure(String action, String entityType, Long entityId, String errorMessage, HttpServletRequest request) {
+    public void logFailure(String action, String entityType, String entityId, String errorMessage, HttpServletRequest request) {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             

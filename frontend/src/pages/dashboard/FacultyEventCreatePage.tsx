@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -15,12 +15,14 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { eventApi, facultyApi } from '@/lib/api';
+import { eventApi, facultyApi, facultyClubApi } from '@/lib/api';
 import { toast } from 'sonner';
 
 const FacultyEventCreatePage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const clubId = searchParams.get('clubId');
     const isEditMode = Boolean(id);
 
     const [loading, setLoading] = useState(isEditMode);
@@ -112,11 +114,19 @@ const FacultyEventCreatePage = () => {
                 await facultyApi.updateEvent(id!, payload);
                 toast.success('Event updated successfully');
             } else {
-                await facultyApi.createEvent(payload);
+                if (clubId) {
+                    await facultyClubApi.createEvent(clubId, payload);
+                } else {
+                    await facultyApi.createEvent(payload);
+                }
                 toast.success('Event created successfully');
             }
 
-            navigate('/dashboard/faculty/events');
+            if (clubId) {
+                navigate(`/dashboard/faculty/clubs/${clubId}`);
+            } else {
+                navigate('/dashboard/faculty/events');
+            }
         } catch (error: any) {
             console.error('Failed to save event:', error);
             toast.error(isEditMode ? 'Failed to update event' : 'Failed to create event');

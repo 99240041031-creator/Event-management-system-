@@ -11,6 +11,9 @@ public interface JudgeScoreRepository extends JpaRepository<JudgeScore, String> 
 
     List<JudgeScore> findByJudge_Id(String judgeId);
 
+    java.util.Optional<JudgeScore> findByJudge_IdAndSubmission_IdAndHackathonRound_Id(
+            String judgeId, String submissionId, String roundId);
+
     java.util.Optional<JudgeScore> findByJudgeAndSubmission(com.eventmanager.model.User judge,
             com.eventmanager.model.Submission submission);
 }

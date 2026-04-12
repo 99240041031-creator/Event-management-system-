@@ -30,7 +30,15 @@ import { judgeService } from '@/services/judgeService';
 import { Trophy, Medal, Crown } from 'lucide-react';
 
 const EventDetailPage = () => {
-  // ... existing state
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuthStore();
+  
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState('');
+  const [feedbacks, setFeedbacks] = useState<any[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [isLocked, setIsLocked] = useState(false);
 

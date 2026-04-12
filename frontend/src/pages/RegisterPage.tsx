@@ -45,7 +45,7 @@ const RegisterPage = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    role: '' as UserRole | '',
+    role: '' as UserRole | 'director' | '',
     firstName: '',
     lastName: '',
     email: '',
@@ -101,7 +101,7 @@ const RegisterPage = () => {
         password: formData.password,
         firstName: formData.firstName,
         lastName: formData.lastName,
-        role: formData.role as UserRole,
+        role: (formData.role === 'director' ? formData.directorRole : formData.role) as UserRole,
         collegeId: formData.collegeId,
         department: formData.department,
         academicYear: formData.role === 'student' && formData.year ? parseInt(formData.year) : undefined,
@@ -126,7 +126,7 @@ const RegisterPage = () => {
   const directorSubRoles = [
     { value: 'hod', label: 'Head of Department' },
     { value: 'college_admin', label: 'College Admin' },
-    { value: 'super_admin', label: 'Super Admin' },
+    { value: 'ambassador', label: 'Ambassador' },
     { value: 'judge', label: 'Judge' }
   ];
 

@@ -58,7 +58,7 @@ const SupportCenter = () => {
 
     const fetchTickets = async () => {
         try {
-            const isAdmin = user?.role === 'super_admin' || user?.role === 'college_admin';
+            const isAdmin = user?.role === 'ambassador' || user?.role === 'college_admin';
             let data;
 
             if (isAdmin) {

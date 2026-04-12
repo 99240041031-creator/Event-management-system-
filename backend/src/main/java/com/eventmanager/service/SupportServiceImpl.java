@@ -76,7 +76,7 @@ public class SupportServiceImpl implements SupportService {
         message.setSentAt(LocalDateTime.now());
         
         // Check if user is admin
-        boolean isAdmin = "super_admin".equalsIgnoreCase(user.getRole()) || "college_admin".equalsIgnoreCase(user.getRole());
+        boolean isAdmin = "ambassador".equalsIgnoreCase(user.getRole()) || "college_admin".equalsIgnoreCase(user.getRole());
         message.setAdminReply(isAdmin);
 
         return messageRepository.save(message);
@@ -92,7 +92,7 @@ public class SupportServiceImpl implements SupportService {
         // Only admins can close/resolve tickets for others, or users can close their own? 
         // Typically support staff updates status. Users might be able to "Resolve" or "Close" their own.
         // For now, allowing admins or the ticket owner.
-        boolean isAdmin = "super_admin".equalsIgnoreCase(user.getRole()) || "college_admin".equalsIgnoreCase(user.getRole());
+        boolean isAdmin = "ambassador".equalsIgnoreCase(user.getRole()) || "college_admin".equalsIgnoreCase(user.getRole());
         boolean isOwner = ticket.getUser().getId().equals(userId);
 
         if (!isAdmin && !isOwner) {

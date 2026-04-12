@@ -16,4 +16,10 @@ public interface EventRepository extends JpaRepository<Event, String> {
     long countByOrganizer_IdAndStatus(String organizerId, String status);
     long countByOrganizer_IdAndCreatedAtAfter(String organizerId, java.time.LocalDateTime createdAt);
     long countByOrganizer_IdAndCreatedAtBetween(String organizerId, java.time.LocalDateTime start, java.time.LocalDateTime end);
+
+    List<Event> findByDepartment_Id(String departmentId);
+    long countByDepartment_IdAndStatus(String departmentId, String status);
+    
+    @org.springframework.data.jpa.repository.Query("SELECT COUNT(e) FROM Event e WHERE e.organizer.id = :facultyId")
+    long countByFacultyId(String facultyId);
 }

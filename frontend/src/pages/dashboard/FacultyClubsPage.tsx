@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -14,10 +14,29 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
+import { facultyClubApi } from '@/lib/api';
 
 const FacultyClubsPage = () => {
     const navigate = useNavigate();
     const [clubs, setClubs] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        loadClubs();
+    }, []);
+
+    const loadClubs = async () => {
+        try {
+            setLoading(true);
+            const response = await facultyClubApi.getClubs();
+            setClubs(response || []);
+        } catch (error) {
+            console.error('Failed to load clubs:', error);
+            // toast.error('Failed to load clubs'); // Optional: show error toast
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const stats = {
         totalClubs: clubs.length,
@@ -90,7 +109,7 @@ const FacultyClubsPage = () => {
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {clubs.map((club) => (
                         <Card key={club.id} className="hover:shadow-lg transition-shadow cursor-pointer"
-                            onClick={() => navigate(`/dashboard/student/clubs/${club.id}`)}>
+                            onClick={() => navigate(`/dashboard/faculty/clubs/${club.id}`)}>
                             <CardHeader>
                                 <div className="flex items-start justify-between">
                                     <div className="flex items-center gap-3">

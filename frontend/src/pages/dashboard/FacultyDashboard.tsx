@@ -140,11 +140,11 @@ const FacultyDashboard = () => {
               </p>
             </div>
             <div className="flex gap-3">
-              <Button variant="secondary" className="whitespace-nowrap" onClick={() => navigate('/dashboard/club/manage')}>
+              <Button variant="secondary" className="whitespace-nowrap" onClick={() => navigate('/dashboard/faculty/clubs')}>
                 <Users className="mr-2 h-4 w-4" />
                 Manage Members
               </Button>
-              <Button variant="secondary" className="whitespace-nowrap" onClick={() => navigate('/dashboard/club/settings')}>
+              <Button variant="secondary" className="whitespace-nowrap" onClick={() => navigate('/dashboard/faculty/clubs')}>
                 <FolderOpen className="mr-2 h-4 w-4" />
                 Club Settings
               </Button>

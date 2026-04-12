@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Component
@@ -20,11 +21,17 @@ public class DataSeeder implements CommandLineRunner {
     private final ForumPostRepository postRepository;
     private final ForumCommentRepository commentRepository;
     private final ProblemStatementRepository problemStatementRepository;
+    private final ContentRepository contentRepository;
+    private final WebinarRepository webinarRepository;
+    private final HackathonRoundRepository hackathonRoundRepository;
 
     public DataSeeder(CollegeRepository collegeRepository, UserRepository userRepository,
             HackathonRepository hackathonRepository, EventRepository eventRepository,
             ClubRepository clubRepository, ForumPostRepository postRepository,
-            ForumCommentRepository commentRepository, ProblemStatementRepository problemStatementRepository) {
+            ForumCommentRepository commentRepository, ProblemStatementRepository problemStatementRepository,
+            @org.springframework.context.annotation.Lazy ContentRepository contentRepository,
+            @org.springframework.context.annotation.Lazy WebinarRepository webinarRepository,
+            @org.springframework.context.annotation.Lazy HackathonRoundRepository hackathonRoundRepository) {
         this.collegeRepository = collegeRepository;
         this.userRepository = userRepository;
         this.hackathonRepository = hackathonRepository;
@@ -33,6 +40,9 @@ public class DataSeeder implements CommandLineRunner {
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
         this.problemStatementRepository = problemStatementRepository;
+        this.contentRepository = contentRepository;
+        this.webinarRepository = webinarRepository;
+        this.hackathonRoundRepository = hackathonRoundRepository;
     }
 
     @Override
@@ -109,7 +119,7 @@ public class DataSeeder implements CommandLineRunner {
             superAdmin.setName("Emma Wilson");
             superAdmin.setEmail("super@platform.com");
             superAdmin.setPassword(new BCryptPasswordEncoder().encode("password"));
-            superAdmin.setRole("super_admin");
+            superAdmin.setRole("ambassador");
             superAdmin.setPoints(2000);
             superAdmin.setStreak(30);
             superAdmin.setAvatar("https://api.dicebear.com/7.x/avataaars/svg?seed=Emma");
@@ -130,10 +140,35 @@ public class DataSeeder implements CommandLineRunner {
             faculty = userRepository.findByEmail("faculty@college.edu").orElse(null);
             admin = userRepository.findByEmail("admin@college.edu").orElse(null);
 
+            // Special check for Arjun kumar to ensure he gets the clubs
+            User arjun = userRepository.findAll().stream()
+                .filter(u -> "Arjun kumar".equals(u.getName())).findFirst().orElse(null);
+            if (arjun != null) {
+                faculty = arjun;
+                faculty.setRole("faculty");
+                faculty.setSubRole("CLUB_HEAD");
+                userRepository.save(faculty);
+            }
+
             // Fallback if records exist but emails don't match (shouldn't happen with count check)
             if (student == null) {
                 student = userRepository.findAll().stream()
                     .filter(u -> "student".equals(u.getRole())).findFirst().orElse(null);
+            }
+        }
+
+        // Seed more Students if needed
+        if (userRepository.count() < 10) {
+            for (int i = 1; i <= 5; i++) {
+                User s = new User();
+                s.setName("Student " + i);
+                s.setEmail("student" + i + "@college.edu");
+                s.setPassword(new BCryptPasswordEncoder().encode("password"));
+                s.setRole("student");
+                s.setCollege(c1);
+                s.setPoints(100 * i);
+                s.setAvatar("https://api.dicebear.com/7.x/avataaars/svg?seed=Student" + i);
+                userRepository.save(s);
             }
         }
 
@@ -165,6 +200,31 @@ public class DataSeeder implements CommandLineRunner {
             h1.setStatus("registration_open");
             h1.setBannerImage("https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80");
             h1 = hackathonRepository.save(h1);
+
+            // Seed Rounds for h1
+            HackathonRound r1 = new HackathonRound();
+            r1.setHackathon(h1);
+            r1.setRoundNumber(1);
+            r1.setName("Ideation & Selection");
+            r1.setStatus(HackathonRound.RoundStatus.COMPLETED);
+            r1.setCriteria("[{\"name\":\"Innovation\",\"maxMarks\":25},{\"name\":\"Feasibility\",\"maxMarks\":25},{\"name\":\"Clarity\",\"maxMarks\":20},{\"name\":\"Impact\",\"maxMarks\":30}]");
+            hackathonRoundRepository.save(r1);
+
+            HackathonRound r2 = new HackathonRound();
+            r2.setHackathon(h1);
+            r2.setRoundNumber(2);
+            r2.setName("MVP Demo");
+            r2.setStatus(HackathonRound.RoundStatus.ONGOING);
+            r2.setCriteria("[{\"name\":\"Technical Complexity\",\"maxMarks\":30},{\"name\":\"UI/UX Experience\",\"maxMarks\":20},{\"name\":\"Core Logic Implementation\",\"maxMarks\":30},{\"name\":\"Presentation\",\"maxMarks\":20}]");
+            hackathonRoundRepository.save(r2);
+
+            HackathonRound r3 = new HackathonRound();
+            r3.setHackathon(h1);
+            r3.setRoundNumber(3);
+            r3.setName("Grand Finale");
+            r3.setStatus(HackathonRound.RoundStatus.UPCOMING);
+            r3.setCriteria("[{\"name\":\"Market Potential\",\"maxMarks\":40},{\"name\":\"Scalability\",\"maxMarks\":30},{\"name\":\"Live Demo Execution\",\"maxMarks\":30}]");
+            hackathonRoundRepository.save(r3);
 
             // 2. Cyber Security Challenge
             Hackathon h2 = new Hackathon();
@@ -343,33 +403,56 @@ public class DataSeeder implements CommandLineRunner {
             h8.setCurrency("USD");
             h8.setStatus("registration_open");
             h8.setBannerImage("https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&q=80");
-            h8 = hackathonRepository.save(h8);
+            h8 = hackathonRepository.save(h8);        }
 
-            // Seed Problem Statements for Neural Nexus
-            ProblemStatement ps1 = new ProblemStatement();
-            ps1.setTitle("Edge-AI for Real-time Translation");
-            ps1.setDescription("Build a low-latency system that converts sign language to speech on edge devices with limited compute.");
-            ps1.setCategory("Computer Vision");
-            ps1.setDifficulty("hard");
-            ps1.setHackathon(h1);
-            problemStatementRepository.save(ps1);
+        // Seed more Problem Statements for Neural Nexus if needed
+        if (problemStatementRepository.count() < 5) {
+            Hackathon neuralNexus = hackathonRepository.findAll().stream()
+                .filter(h -> h.getTitle().contains("Neural Nexus"))
+                .findFirst().orElse(null);
+            
+            if (neuralNexus != null) {
+                ProblemStatement psExtra = new ProblemStatement();
+                psExtra.setTitle("Generative Art for Mental Health");
+                psExtra.setDescription("Develop an AI model that creates personalized calming visual art based on biofeedback data.");
+                psExtra.setCategory("AI/Healthcare");
+                psExtra.setDifficulty("medium");
+                psExtra.setHackathon(neuralNexus);
+                problemStatementRepository.save(psExtra);
+            }
+        }
 
-            ProblemStatement ps2 = new ProblemStatement();
-            ps2.setTitle("Autonomous DeFi Risk Guard");
-            ps2.setDescription("Create an AI agent that monitors smart contract transactions for flash-loan attack patterns in real-time.");
-            ps2.setCategory("FinTech/AI");
-            ps2.setDifficulty("medium");
-            ps2.setHackathon(h1);
-            problemStatementRepository.save(ps2);
+        if (hackathonRepository.count() < 10) {
+            for (int i = 9; i <= 10; i++) {
+                Hackathon h = new Hackathon();
+                h.setTitle("Extra Hackathon " + i);
+                h.setShortDescription("Additional hackathon for demo purpose.");
+                h.setDescription("Extended descriptions for more realistic data.");
+                h.setCollege(c1);
+                h.setOrganizer(admin);
+                h.setMode("online");
+                h.setStartDate(LocalDate.now().plusWeeks(i));
+                h.setEndDate(LocalDate.now().plusWeeks(i).plusDays(2));
+                h.setStatus("upcoming");
+                h.setBannerImage("https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800");
+                hackathonRepository.save(h);
+            }
+        }
 
-            ProblemStatement ps3 = new ProblemStatement();
-            ps3.setTitle("Swarm Intelligence for Disaster Relief");
-            ps3.setDescription("Optimize the coordination of drone swarms for search and rescue operations using collective intelligence models.");
-            ps3.setCategory("Robotics");
-            ps3.setDifficulty("hard");
-            ps3.setHackathon(h1);
-            problemStatementRepository.save(ps3);
-
+        if (eventRepository.count() < 10) {
+            String[] types = {"workshop", "seminar", "competition", "tech_talk", "networking"};
+            for (int i = 2; i <= 10; i++) {
+                Event e = new Event();
+                e.setTitle("Tech Event " + i);
+                e.setDescription("Exciting session on modern technology " + i);
+                e.setCollege(c1);
+                e.setOrganizer(faculty);
+                e.setStartDate(LocalDateTime.now().plusDays(i + 2));
+                e.setEndDate(LocalDateTime.now().plusDays(i + 2).plusHours(3));
+                e.setEventType(types[i % types.length]);
+                e.setStatus("registration_open");
+                eventRepository.save(e);
+            }
         }
 
         if (eventRepository.count() == 0) {
@@ -528,7 +611,74 @@ public class DataSeeder implements CommandLineRunner {
             club8.setAchievements("Developed 5 DApps, 2 blockchain research papers");
             clubRepository.save(club8);
 
+            // Add 2 more clubs to reach 10
+            for (int i = 9; i <= 10; i++) {
+                Club c = new Club();
+                c.setName("Interest Club " + i);
+                c.setDescription("A club for shared interests and hobbies.");
+                c.setCollege(c1);
+                c.setFacultyAdvisor(faculty);
+                c.setPresident(student);
+                c.setCategory("Social");
+                c.setActive(true);
+                clubRepository.save(c);
+            }
+
             System.out.println("Database seeded successfully with demo accounts and clubs!");
+        } else {
+            // If clubs exist but we want to ensure Arjun owns them for the demo
+            User arjun = userRepository.findAll().stream()
+                .filter(u -> "Arjun kumar".equals(u.getName())).findFirst().orElse(null);
+            
+            if (arjun != null) {
+                arjun.setRole("faculty");
+                arjun.setSubRole("CLUB_HEAD");
+                userRepository.save(arjun);
+                
+                List<Club> clubs = clubRepository.findAll();
+                for (Club club : clubs) {
+                    club.setFacultyAdvisor(arjun);
+                    club.setPresident(arjun); // For demo purposes, make him the boss
+                    clubRepository.save(club);
+                }
+                System.out.println("Re-assigned " + clubs.size() + " clubs to Arjun kumar");
+            }
+        }
+
+        // Seed Resources (Content)
+        if (contentRepository.count() < 10) {
+            for (int i = 1; i <= 10; i++) {
+                Content c = new Content();
+                c.setTitle("Study Material " + i);
+                c.setDescription("Valuable resource for subject " + i);
+                c.setUploader(faculty);
+                c.setCollege(c1);
+                c.setCategory("study_material");
+                c.setFileType("pdf");
+                c.setFileSize(2048L * i);
+                c.setStatus("approved");
+                c.setCreatedAt(LocalDateTime.now().minusDays(i));
+                contentRepository.save(c);
+            }
+        }
+
+        // Seed Webinars
+        if (webinarRepository.count() < 10) {
+            for (int i = 1; i <= 10; i++) {
+                Webinar w = new Webinar();
+                w.setTitle("Innovation Webinar " + i);
+                w.setSpeakerName("Expert " + i);
+                w.setSpeakerBio("Bio of expert speaker " + i);
+                w.setHostCollege("Tech University");
+                w.setMode("Online");
+                w.setStartDate(LocalDateTime.now().plusDays(i + 5));
+                w.setEndDate(LocalDateTime.now().plusDays(i + 5).plusHours(2));
+                w.setDuration(120);
+                w.setMaxParticipants(100);
+                w.setStatus("UPCOMING");
+                w.setCreatedBy(faculty.getId());
+                webinarRepository.save(w);
+            }
         }
     }
 }

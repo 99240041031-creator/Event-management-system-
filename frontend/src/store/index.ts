@@ -82,7 +82,7 @@ const mockUsers: Record<string, User> = {
     firstName: 'Emma',
     lastName: 'Wilson',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emma',
-    role: 'super_admin',
+    role: 'ambassador',
     points: 2000,
     streak: 30,
     createdAt: new Date('2020-01-01'),
@@ -146,6 +146,7 @@ export const useAuthStore = create<AuthState>()(
             ...backendUser,
             firstName: backendUser.firstName || firstName,
             lastName: backendUser.lastName || lastName,
+            isClubHead: backendUser.subRole === 'CLUB_HEAD',
           };
 
           set({

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 public class DepartmentIsolationService {
 
     public boolean canAccess(User currentUser, String targetDepartmentId) {
-        if (Roles.SUPER_ADMIN.equals(currentUser.getRole()) || Roles.COLLEGE_ADMIN.equals(currentUser.getRole())) {
+        if (Roles.AMBASSADOR.equals(currentUser.getRole()) || Roles.COLLEGE_ADMIN.equals(currentUser.getRole())) {
             return true;
         }
 

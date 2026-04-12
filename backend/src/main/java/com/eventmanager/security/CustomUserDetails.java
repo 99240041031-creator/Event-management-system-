@@ -22,7 +22,17 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().toUpperCase()));
+        java.util.List<SimpleGrantedAuthority> authorities = new java.util.ArrayList<>();
+        
+        if (user.getRole() != null) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().toUpperCase()));
+        }
+        
+        if (user.getSubRole() != null && !user.getSubRole().isEmpty()) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getSubRole().toUpperCase()));
+        }
+        
+        return authorities;
     }
 
     @Override

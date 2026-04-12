@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     ShieldCheck,
     Award,
@@ -8,14 +8,10 @@ import {
     ExternalLink,
     Calendar,
     Globe,
-    Cpu,
-    Zap,
-    Trophy,
     CheckCircle2,
-    XCircle,
     Loader2,
     ArrowRight,
-    Box
+    Download
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -24,47 +20,6 @@ import { certificateApi } from '@/lib/api';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import type { Certificate } from '@/types';
-
-const TiltCard = ({ children, className }: { children: React.ReactNode; className?: string }) => {
-    const x = useMotionValue(0);
-    const y = useMotionValue(0);
-
-    const mouseXSpring = useSpring(x);
-    const mouseYSpring = useSpring(y);
-
-    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["7deg", "-7deg"]);
-    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-7deg", "7deg"]);
-
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        const width = rect.width;
-        const height = rect.height;
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-        const xPct = mouseX / width - 0.5;
-        const yPct = mouseY / height - 0.5;
-        x.set(xPct);
-        y.set(yPct);
-    };
-
-    const handleMouseLeave = () => {
-        x.set(0);
-        y.set(0);
-    };
-
-    return (
-        <motion.div
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            style={{ rotateY, rotateX, transformStyle: "preserve-3d" }}
-            className={cn("relative group", className)}
-        >
-            <div style={{ transform: "translateZ(60px)", transformStyle: "preserve-3d" }} className="h-full">
-                {children}
-            </div>
-        </motion.div>
-    );
-};
 
 const VerificationPage = () => {
     const { certificateId } = useParams<{ certificateId: string }>();
@@ -96,139 +51,127 @@ const VerificationPage = () => {
     }, [certificateId]);
 
     return (
-        <div className="min-h-screen bg-slate-950 flex items-center justify-center p-8 relative overflow-hidden selection:bg-teal-500/30">
-            {/* Background Aesthetics */}
-            <div className="absolute inset-0 z-0">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] bg-teal-500/5 rounded-full blur-[150px] animate-pulse" />
-                <div className="absolute inset-0 opacity-10" style={{ backgroundImage: `radial-gradient(circle at 1px 1px, #14b8a6 1px, transparent 0)`, backgroundSize: '80px 80px' }} />
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+            {/* Top Navigation */}
+            <div className="absolute top-0 left-0 right-0 p-6 flex justify-center">
+                <div className="flex items-center gap-2 cursor-pointer transition-colors" onClick={() => navigate('/')}>
+                    <div className="h-10 w-10 bg-teal-600 rounded-xl flex items-center justify-center">
+                        <span className="text-white font-black text-xl leading-none">C</span>
+                    </div>
+                </div>
             </div>
 
-            <div className="relative z-10 w-full max-w-2xl">
+            <div className="relative z-10 w-full max-w-3xl mx-auto mt-12">
                 <AnimatePresence mode="wait">
                     {status === 'loading' ? (
                         <motion.div
                             key="loading"
-                            initial={{ opacity: 0, scale: 0.9 }}
+                            initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 1.1 }}
-                            className="text-center space-y-10"
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="bg-white dark:bg-slate-900 rounded-[2rem] p-16 text-center shadow-xl border border-slate-100 dark:border-slate-800"
                         >
-                            <div className="relative inline-block">
-                                <div className="h-40 w-40 border-4 border-teal-500/10 border-t-teal-500 rounded-full animate-spin transition-all" />
-                                <Box className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-16 w-16 text-teal-400 animate-bounce" />
-                            </div>
-                            <div className="space-y-6">
-                                <h1 className="text-5xl font-black text-white uppercase italic tracking-tighter">Querying Ledger...</h1>
-                                <p className="text-slate-500 font-bold uppercase tracking-[0.6em] text-[12px] animate-pulse">Authenticating Cryptographic Proof</p>
-                            </div>
+                            <Loader2 className="h-16 w-16 text-teal-600 animate-spin mx-auto mb-8" />
+                            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Verifying Credential</h1>
+                            <p className="text-slate-500 font-medium">Please wait while we check our cryptographic registry...</p>
                         </motion.div>
                     ) : status === 'valid' && certificate ? (
                         <motion.div
                             key="valid"
-                            initial={{ opacity: 0, y: 50 }}
+                            initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="space-y-10"
+                            className="space-y-8"
                         >
-                            <div className="text-center space-y-6">
+                            <div className="text-center space-y-4 mb-10">
                                 <motion.div
-                                    initial={{ scale: 0, rotate: -180 }}
-                                    animate={{ scale: 1, rotate: 0 }}
-                                    transition={{ type: "spring", stiffness: 260, damping: 20 }}
-                                    className="h-28 w-28 bg-teal-500 rounded-[3rem] flex items-center justify-center mx-auto shadow-[0_0_80px_rgba(20,184,166,0.6)] border-8 border-slate-950"
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    transition={{ type: "spring" }}
+                                    className="h-24 w-24 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm"
                                 >
-                                    <CheckCircle2 className="h-14 w-14 text-white" />
+                                    <CheckCircle2 className="h-12 w-12" />
                                 </motion.div>
-                                <div className="space-y-3">
-                                    <h1 className="text-6xl font-black text-white uppercase italic tracking-tighter leading-none">Record: <span className="text-teal-400 drop-shadow-[0_0_15px_rgba(20,184,166,0.3)]">Valid</span></h1>
-                                    <p className="text-slate-600 font-bold uppercase tracking-[0.5em] text-[11px] italic">Public Credential Authority Node Verified</p>
-                                </div>
+                                <h1 className="text-4xl text-slate-900 dark:text-white font-black tracking-tight">Verified Credential</h1>
+                                <p className="text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider text-sm">Successfully Authenticated</p>
                             </div>
 
-                            <TiltCard>
-                                <Card className="bg-white/5 border border-white/10 rounded-[4rem] p-14 backdrop-blur-3xl space-y-14 shadow-2xl relative overflow-hidden group">
-                                    <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/5 blur-[80px] rounded-full group-hover:bg-teal-500/10 transition-all duration-700" />
+                            <Card className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 md:p-12 shadow-xl relative overflow-hidden">
+                                <div className="absolute top-0 right-0 p-8">
+                                    <Badge variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50 dark:text-emerald-400 dark:border-emerald-900 dark:bg-emerald-950/50 uppercase font-bold text-xs tracking-wider">
+                                        Valid
+                                    </Badge>
+                                </div>
 
-                                    <div className="space-y-10 relative z-10">
-                                        <div className="flex justify-between items-start">
-                                            <div className="space-y-3">
-                                                <p className="text-[12px] font-black text-teal-500 uppercase tracking-[0.4em] italic leading-none">Protocol Recipient</p>
-                                                <p className="text-4xl font-black text-white uppercase italic tracking-tight">{certificate.studentName}</p>
-                                            </div>
-                                            <div className="h-20 w-20 bg-white/5 rounded-3xl flex items-center justify-center shadow-inner border border-white/5">
-                                                <Award className="h-10 w-10 text-teal-400 transition-transform group-hover:scale-110 group-hover:rotate-12 duration-500" />
-                                            </div>
+                                <div className="space-y-8">
+                                    <div>
+                                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Credential Holder</p>
+                                        <p className="text-3xl font-black text-slate-900 dark:text-white">{certificate.studentName}</p>
+                                    </div>
+                                    
+                                    <div className="h-px bg-slate-100 dark:bg-slate-800" />
+
+                                    <div>
+                                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Achievement Focus</p>
+                                        <p className="text-xl font-bold text-teal-700 dark:text-teal-400">{certificate.eventTitle}</p>
+                                        <p className="text-sm font-semibold text-slate-600 dark:text-slate-400 mt-2">Designation: <span className="uppercase text-slate-900 dark:text-slate-200">{certificate.role}</span></p>
+                                    </div>
+
+                                    <div className="h-px bg-slate-100 dark:bg-slate-800" />
+
+                                    <div className="grid grid-cols-2 gap-8">
+                                        <div>
+                                            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Date</p>
+                                            <p className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                                                <Calendar className="h-4 w-4 text-slate-400" /> 
+                                                {format(new Date(certificate.issuedAt || new Date()), 'MMM dd, yyyy')}
+                                            </p>
                                         </div>
-
-                                        <div className="space-y-3">
-                                            <p className="text-[12px] font-black text-slate-600 uppercase tracking-[0.4em] italic leading-none">Achievement Scope</p>
-                                            <h3 className="text-3xl font-black text-white leading-tight uppercase underline underline-offset-[12px] decoration-teal-500/20">{certificate.eventTitle}</h3>
-                                        </div>
-
-                                        <div className="grid grid-cols-2 gap-10 pt-4">
-                                            <div className="space-y-2">
-                                                <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] italic leading-none">Designation</p>
-                                                <p className="text-base font-black text-white uppercase italic tracking-tight">{certificate.role}</p>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <p className="text-[10px] font-black text-slate-600 uppercase tracking-[0.4em] italic leading-none">Authority Sealed</p>
-                                                <p className="text-base font-black text-white uppercase italic tracking-tight">{format(new Date(certificate.issuedAt), 'dd MMMM yyyy')}</p>
-                                            </div>
+                                        <div>
+                                            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Credential ID</p>
+                                            <p className="font-mono text-sm font-semibold text-slate-900 dark:text-white">
+                                                {certificate.certificateId}
+                                            </p>
                                         </div>
                                     </div>
 
-                                    <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-10 relative z-10">
-                                        <div className="flex items-center gap-6">
-                                            <div className="h-16 w-16 rounded-2xl bg-teal-500/10 flex items-center justify-center border border-teal-500/20 shadow-inner">
-                                                <Globe className="h-8 w-8 text-teal-400" />
-                                            </div>
+                                    <div className="pt-8 mt-8 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                                        <div className="flex items-center gap-3">
+                                            <ShieldCheck className="h-8 w-8 text-emerald-500" />
                                             <div>
-                                                <p className="text-[11px] font-black text-slate-600 uppercase tracking-[0.3em] leading-none mb-1">Authenticated By</p>
-                                                <p className="text-sm font-black text-white uppercase tracking-widest italic">Institutional Registry Node</p>
+                                                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Issuer</p>
+                                                <p className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1">CollegeHub Network <Globe className="h-3 w-3 text-blue-500" /></p>
                                             </div>
                                         </div>
-                                        <Button
-                                            className="h-20 px-10 rounded-3xl bg-white text-slate-950 hover:bg-teal-500 hover:text-white transition-all duration-500 font-black uppercase tracking-[0.3em] text-[11px] gap-4 shadow-2xl group"
-                                            onClick={() => window.print()}
-                                        >
-                                            <Download className="h-5 w-5 group-hover:-translate-y-1 transition-transform" /> PRINT RECORD
+                                        <Button onClick={() => window.print()} variant="outline" className="shadow-sm font-semibold gap-2 border-slate-200 dark:border-slate-700">
+                                            <Download className="h-4 w-4" /> Print
                                         </Button>
                                     </div>
-                                </Card>
-                            </TiltCard>
-
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: 0.8 }}
-                                className="text-center"
-                            >
-                                <p className="text-slate-700 text-[10px] font-black uppercase tracking-[0.6em] italic">Cryptographically sealed via SMART-EVENT-PROXY-01</p>
-                            </motion.div>
+                                </div>
+                            </Card>
                         </motion.div>
                     ) : (
                         <motion.div
                             key="invalid"
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="text-center space-y-12"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-white dark:bg-slate-900 rounded-[2rem] p-16 text-center shadow-xl border border-slate-100 dark:border-slate-800"
                         >
                             <motion.div
-                                animate={{ rotate: [0, -10, 10, -10, 10, 0] }}
-                                transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
-                                className="h-32 w-32 bg-red-500 rounded-[3.5rem] flex items-center justify-center mx-auto shadow-[0_0_100px_rgba(239,68,68,0.4)] border-8 border-slate-950"
+                                animate={{ x: [-5, 5, -5, 5, 0] }}
+                                transition={{ duration: 0.5 }}
+                                className="mx-auto"
                             >
-                                <ShieldAlert className="h-16 w-16 text-white" />
+                                <div className="h-24 w-24 bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                                    <ShieldAlert className="h-12 w-12" />
+                                </div>
                             </motion.div>
-                            <div className="space-y-6">
-                                <h1 className="text-6xl font-black text-white uppercase italic tracking-tighter">Protocol <span className="text-red-500">Breach.</span></h1>
-                                <p className="text-slate-500 font-bold uppercase tracking-[0.3em] text-[12px] px-12 leading-relaxed italic">The provided intellectual property identifier could not be validated against the central network ledger. Access denied.</p>
-                            </div>
+                            <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-4">Verification Failed</h1>
+                            <p className="text-slate-500 font-medium mb-10 max-w-sm mx-auto">We could not find a valid certificate matching this identifier. It may have been revoked or the ID is incorrect.</p>
                             <Button
                                 onClick={() => navigate('/')}
-                                variant="outline"
-                                className="h-20 px-12 rounded-3xl border-white/10 bg-white/5 text-white font-black uppercase tracking-[0.4em] text-[11px] hover:bg-red-500/10 hover:border-red-500/30 transition-all gap-4"
+                                className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 w-full md:w-auto px-10 h-12 rounded-xl font-bold gap-2"
                             >
-                                SECURITY HOMEPAGE <ArrowRight className="h-5 w-5" />
+                                Valid Credentials Hub <ArrowRight className="h-4 w-4" />
                             </Button>
                         </motion.div>
                     )}

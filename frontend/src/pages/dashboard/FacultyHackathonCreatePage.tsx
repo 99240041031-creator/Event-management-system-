@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -15,12 +15,14 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { hackathonApi, facultyApi } from '@/lib/api';
+import { hackathonApi, facultyApi, facultyClubApi } from '@/lib/api';
 import { toast } from 'sonner';
 
 const FacultyHackathonCreatePage = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const clubId = searchParams.get('clubId');
     const isEditMode = Boolean(id);
 
     const [loading, setLoading] = useState(isEditMode);
@@ -122,11 +124,19 @@ const FacultyHackathonCreatePage = () => {
                 await facultyApi.updateHackathon(id!, payload);
                 toast.success('Hackathon updated successfully');
             } else {
-                await facultyApi.createHackathon(payload);
+                if (clubId) {
+                    await facultyClubApi.createHackathon(clubId, payload);
+                } else {
+                    await facultyApi.createHackathon(payload);
+                }
                 toast.success('Hackathon created successfully');
             }
 
-            navigate('/dashboard/faculty/hackathons');
+            if (clubId) {
+                navigate(`/dashboard/faculty/clubs/${clubId}`);
+            } else {
+                navigate('/dashboard/faculty/hackathons');
+            }
         } catch (error: any) {
             console.error('Failed to save hackathon:', error);
             toast.error(isEditMode ? 'Failed to update hackathon' : 'Failed to create hackathon');

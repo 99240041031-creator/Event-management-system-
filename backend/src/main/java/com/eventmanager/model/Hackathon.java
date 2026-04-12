@@ -57,7 +57,13 @@ public class Hackathon {
     private Integer registeredCount = 0;
 
     private String approvalStatus = "PENDING";
-    private String status = "OPEN";
+    private String status = "UPCOMING";
+
+    private String currentRoundId;
+
+    @OneToMany(mappedBy = "hackathon", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OrderBy("roundNumber ASC")
+    private List<HackathonRound> rounds;
 
     private String createdBy;
 

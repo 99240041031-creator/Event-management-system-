@@ -1,5 +1,5 @@
 // User Roles
-export type UserRole = 'super_admin' | 'college_admin' | 'hod' | 'faculty' | 'student' | 'judge' | 'sponsor' | 'dean_of_campus' | 'faculty_coordinator';
+export type UserRole = 'ambassador' | 'college_admin' | 'hod' | 'faculty' | 'student' | 'judge' | 'sponsor' | 'dean_of_campus' | 'faculty_coordinator';
 
 // User Interface
 export interface User {
@@ -12,6 +12,8 @@ export interface User {
   collegeId?: string;
   collegeName?: string;
   department?: string;
+  departmentId?: string;
+  departmentEntity?: Department;
   directorRole?: string;
   isClubHead?: boolean;
   year?: number; // Legacy field, map academicYear to this or use academicYear
@@ -21,6 +23,14 @@ export interface User {
   streak: number;
   createdAt: Date;
   isEmailVerified: boolean;
+}
+
+export interface Department {
+  id: string;
+  name: string;
+  collegeId: string;
+  description?: string;
+  hodId?: string;
 }
 
 // College Interface
@@ -78,6 +88,7 @@ export interface Hackathon {
   registeredTeams: number;
   totalParticipants: number;
   isPublic: boolean;
+  currency?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -131,6 +142,7 @@ export interface Event {
   registrationDeadline?: Date;
   capacity?: number;
   registeredCount: number;
+  attendeesCount?: number;
   status: 'draft' | 'published' | 'registration_open' | 'ongoing' | 'completed' | 'cancelled' | 'HOD_APPROVAL_PENDING' | 'ACTIVE';
   tags: string[];
   requirements?: string;
@@ -302,17 +314,42 @@ export interface CollegeRanking {
 // Certificate Interface
 export interface Certificate {
   id: string;
-  certificateId: string;
-  studentId: string;
-  studentName: string;
+  certificateId?: string;
+  studentId?: string;
+  studentName?: string;
+  userName?: string;
   eventId?: string;
   eventTitle?: string;
-  category: string;
-  role: string;
-  issuedAt: string;
-  status: 'VERIFIED' | 'REVOKED';
-  qrCodeUrl: string;
-  pdfUrl: string;
+  eventName?: string;
+  hackathonId?: string;
+  hackathonName?: string;
+  type?: string;
+  issueDate?: string | Date;
+  position?: string;
+  category?: string;
+  role?: string;
+  issuedAt?: string | Date;
+  status?: 'ACTIVE' | 'REVOKED';
+  userId?: string;
+  qrCodeUrl?: string; // Optional if not yet generated
+  pdfUrl?: string;
+  certificateUrl?: string;
+  certificateNumber?: string;
+  verified?: boolean;
+}
+
+export interface ClubCertificate extends Certificate {
+  clubId: string;
+}
+
+export interface ClubEventRegistration {
+  id: string;
+  studentId: string;
+  studentName: string;
+  attendanceStatus: 'REGISTERED' | 'ATTENDED' | 'ABSENT';
+  completionStatus: 'COMPLETED' | 'INCOMPLETE';
+  registeredAt: string;
+  attendedAt?: string;
 }
 
 // Judge Evaluation
@@ -395,6 +432,7 @@ export interface Club {
   tags?: string;
   achievements?: string;
   isActive: boolean;
+  recruitmentOpen?: boolean;
   createdAt: string;
 }
 
@@ -447,3 +485,105 @@ export interface WebinarRegistration {
 }
 
 export type Theme = 'light' | 'dark' | 'system';
+
+// --- Club Management System Types ---
+
+export type ClubEvent = Event;
+export type ClubHackathon = Hackathon;
+
+export interface ClubMember {
+  id: string; // This is the ID of the membership record
+  userId: string;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+  joinedAt: string;
+  contributionScore: number;
+}
+
+export interface ClubJoinRequest {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  clubId: string;
+  message: string;
+  resumeUrl?: string;
+  portfolioLink?: string;
+  skills?: string;
+  interviewScore?: number;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  createdAt: string;
+}
+
+export interface ClubPost {
+  id: string;
+  clubId: string;
+  title: string;
+  content: string;
+  authorId: string;
+  authorName?: string;
+  likes: number;
+  commentsCount: number;
+  createdAt: string;
+}
+
+export interface ClubBudget {
+  id: string;
+  clubId: string;
+  allocated: number;
+  spent: number;
+  revenue: number;
+  fiscalYear: string;
+  updatedAt: string;
+}
+
+export interface Ambassador {
+  id: string;
+  clubId: string;
+  studentId: string;
+  studentName: string;
+  referrals: number;
+  impactScore: number;
+  status: 'ACTIVE' | 'INACTIVE';
+  joinedAt: string;
+}
+
+export interface ClubHackathonTeam {
+  id: string;
+  hackathonId: string;
+  teamName: string;
+  leaderId: string;
+  leaderName?: string;
+  members: string[]; // List of names or IDs depending on usage
+  projectTitle?: string;
+  projectDescription?: string;
+  submissionUrl?: string;
+  totalScore: number;
+  createdAt: string;
+}
+
+export interface HackathonScore {
+  id: string;
+  teamId: string;
+  judgeId: string;
+  innovation: number;
+  technical: number;
+  presentation: number;
+  totalScore: number;
+  feedback?: string;
+}
+
+export interface RecruitmentNotice {
+  id: string;
+  clubId: string;
+  title: string;
+  description: string;
+  role: string;
+  requirements: string;
+  deadline: string;
+  isOpen: boolean;
+  createdAt: string;
+}
+

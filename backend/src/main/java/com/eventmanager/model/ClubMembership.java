@@ -25,6 +25,9 @@ public class ClubMembership {
 
     private LocalDateTime joinedAt = LocalDateTime.now();
     private String status; // ACTIVE, PENDING, INACTIVE
+    
+    // New field for Club Management System
+    private Integer contributionScore = 0;
 
     public void setClub(Club club) {
         this.club = club;
@@ -53,4 +56,7 @@ public class ClubMembership {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public Integer getContributionScore() { return contributionScore; }
+    public void setContributionScore(Integer contributionScore) { this.contributionScore = contributionScore; }
 }

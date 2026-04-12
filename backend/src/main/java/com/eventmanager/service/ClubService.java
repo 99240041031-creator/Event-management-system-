@@ -13,6 +13,8 @@ public interface ClubService {
 
     List<Club> getClubsByCollege(String collegeId);
 
+    List<Club> getClubsByFacultyAdvisor(String facultyId);
+
     Optional<Club> getClubById(String id);
 
     Club createClub(Club club);
@@ -48,4 +50,49 @@ public interface ClubService {
     List<ClubJoinRequest> getClubJoinRequests(String clubId);
 
     ClubJoinRequest updateJoinRequestStatus(String requestId, String status);
+
+    // Faculty Management Extensions
+    Club toggleRecruitment(String clubId, boolean isOpen);
+    
+    // Budget
+    com.eventmanager.model.ClubBudget getClubBudget(String clubId);
+    com.eventmanager.model.ClubBudget updateClubBudget(String clubId, Double allocated, Double spent, Double revenue);
+    
+    // Club Events (Specific to Club entity)
+    List<com.eventmanager.model.ClubEvent> getClubEvents(String clubId);
+    com.eventmanager.model.ClubEvent createClubEvent(com.eventmanager.model.ClubEvent event);
+    
+    // Club Hackathons
+    List<com.eventmanager.model.ClubHackathon> getClubHackathons(String clubId);
+    com.eventmanager.model.ClubHackathon createClubHackathon(com.eventmanager.model.ClubHackathon hackathon);
+    
+    // Club Hackathon Management
+    com.eventmanager.model.ClubHackathonTeam registerClubHackathonTeam(String hackathonId, String teamName, List<String> studentIds);
+    com.eventmanager.model.ClubHackathonTeam scoreClubHackathonTeam(String teamId, Double score, String feedback);
+    List<com.eventmanager.model.ClubHackathonTeam> getClubHackathonLeaderboard(String hackathonId);
+    // Ambassadors
+    com.eventmanager.model.ClubAmbassador addAmbassador(String clubId, String studentId);
+    List<com.eventmanager.model.ClubAmbassador> getClubAmbassadors(String clubId);
+
+    // Certificates
+    void generateCertificatesForEvent(String clubId, String eventId);
+    List<com.eventmanager.model.ClubCertificate> getClubCertificates(String clubId);
+    String generateCertificateId();
+    com.eventmanager.model.ClubCertificate verifyCertificate(String certificateId);
+    void revokeCertificate(String certificateId);
+    
+    // Analytics
+    java.util.Map<String, Object> getClubAnalytics(String clubId);
+    
+    // Event Registration & Attendance
+    com.eventmanager.model.ClubEventRegistration registerForEvent(String eventId, String studentId);
+    List<com.eventmanager.model.ClubEventRegistration> getEventParticipants(String eventId);
+    void markAttendance(String eventId, String studentId, String status);
+    
+    // Recruitment Advanced
+    void updateJoinRequestScore(String requestId, Double score);
+    List<com.eventmanager.model.ClubMembership> bulkApproveApplications(List<String> requestIds);
+    
+    // Export
+    List<com.eventmanager.model.ClubMembership> exportMembers(String clubId);
 }

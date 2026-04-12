@@ -38,14 +38,20 @@ import { Monitor, BarChart } from 'lucide-react';
 
 const getMenuItems = (role: string) => {
   switch (role) {
-    case 'super_admin':
+    case 'ambassador':
       return [
-        { name: 'University Control', href: '/dashboard/super-admin', icon: Building2 },
-        { name: 'Manage Colleges', href: '/dashboard/super-admin/colleges', icon: Building2 },
-        { name: 'HOD Accounts', href: '/dashboard/super-admin/hods', icon: Users },
-        { name: 'Configuration', href: '/dashboard/super-admin/settings', icon: Settings },
-        { name: 'Global Analytics', href: '/dashboard/super-admin/analytics', icon: BarChart3 },
+        { name: 'Headquarters', href: '/dashboard/ambassador', icon: LayoutDashboard },
+        { name: 'Tracked Students', href: '/dashboard/ambassador/students', icon: GraduationCap },
+        { name: 'Network Map', href: '/dashboard/ambassador/network', icon: Globe },
+        { name: 'Promotion Deck', href: '/dashboard/ambassador/events', icon: Calendar },
+        { name: 'Referrals & Links', href: '/dashboard/ambassador/referrals', icon: Users },
+        { name: 'Leaderboard', href: '/dashboard/ambassador/leaderboard', icon: Trophy },
+        { name: 'Ambassador Connect', href: '/dashboard/ambassador/chat', icon: MessageSquare },
+        { name: 'Mapped Colleges', href: '/dashboard/ambassador/colleges', icon: Building2 },
+        { name: 'Deep Analytics', href: '/dashboard/ambassador/analytics', icon: BarChart3 },
+        { name: 'Promotion Toolkit', href: '/dashboard/ambassador/toolkit', icon: FolderOpen },
       ];
+
     case 'dean_of_campus':
       return [
         { name: 'Campus Analytics', href: '/dashboard/dean', icon: BarChart3 },
@@ -96,11 +102,19 @@ const getMenuItems = (role: string) => {
     case 'student':
     default:
       return [
-        { name: 'My Events', href: '/dashboard/student', icon: Calendar },
-        { name: 'My Teams', href: '/dashboard/student/teams', icon: Users },
+        { name: 'Dashboard', href: '/dashboard/student', icon: LayoutDashboard },
+        { name: 'Hackathons', href: '/dashboard/student/hackathons', icon: Trophy },
+        { name: 'Events', href: '/dashboard/student/events', icon: Calendar },
+        { name: 'Teams', href: '/dashboard/student/teams', icon: Users },
+        { name: 'Clubs', href: '/dashboard/student/clubs', icon: Globe },
+        { name: 'Webinars', href: '/dashboard/student/webinars', icon: Video },
         { name: 'Certificates', href: '/dashboard/student/certificates', icon: Award },
-        { name: 'Leaderboard', href: '/dashboard/student/leaderboard', icon: Trophy },
-        { name: 'Clubs', href: '/dashboard/student/clubs', icon: Users },
+        { name: 'Calendar', href: '/dashboard/student/calendar', icon: BookOpen },
+        { name: 'Community', href: '/dashboard/student/community', icon: MessageSquare },
+        { name: 'Analytics', href: '/dashboard/student/analytics', icon: BarChart3 },
+        { name: 'Notifications', href: '/dashboard/student/notifications', icon: Bell },
+        { name: 'Support', href: '/dashboard/student/support', icon: HelpCircle },
+        { name: 'Profile', href: '/dashboard/student/profile', icon: GraduationCap },
       ];
   }
 };

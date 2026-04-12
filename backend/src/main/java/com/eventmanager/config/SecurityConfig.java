@@ -58,10 +58,10 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         // Governance & Approval (HOD/Faculty)
                         .requestMatchers("/api/governance/**")
-                        .hasAnyRole("HOD", "FACULTY", "COLLEGE_ADMIN", "SUPER_ADMIN")
+                        .hasAnyRole("HOD", "FACULTY", "COLLEGE_ADMIN", "AMBASSADOR")
                         // Judge specific routes
-                        .requestMatchers("/api/judge/**").hasAnyRole("JUDGE", "DIRECTOR")
-                        .requestMatchers("/api/evaluation/**").hasAnyRole("JUDGE", "DIRECTOR")
+                        .requestMatchers("/api/judge/**").hasAnyRole("JUDGE", "DIRECTOR", "HOD", "FACULTY")
+                        .requestMatchers("/api/evaluation/**").hasAnyRole("JUDGE", "DIRECTOR", "HOD", "FACULTY")
                         // General API access
                         .requestMatchers("/api/clubs/**").authenticated()
                         .requestMatchers("/api/events/**").authenticated()

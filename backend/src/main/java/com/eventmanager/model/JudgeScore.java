@@ -23,6 +23,12 @@ public class JudgeScore {
     @Column(columnDefinition = "TEXT")
     private String criteriaScores; // JSON string for criteria-wise scores
 
+    @ManyToOne
+    @JoinColumn(name = "round_id")
+    private HackathonRound hackathonRound;
+
+    private Integer roundNumber;
+
     private Double totalScore;
 
     @Column(columnDefinition = "TEXT")
@@ -64,12 +70,24 @@ public class JudgeScore {
         this.submission = submission;
     }
 
-    public String getCriteriaScores() {
-        return criteriaScores;
-    }
-
     public void setCriteriaScores(String criteriaScores) {
         this.criteriaScores = criteriaScores;
+    }
+
+    public HackathonRound getHackathonRound() {
+        return hackathonRound;
+    }
+
+    public void setHackathonRound(HackathonRound hackathonRound) {
+        this.hackathonRound = hackathonRound;
+    }
+
+    public Integer getRoundNumber() {
+        return roundNumber;
+    }
+
+    public void setRoundNumber(Integer roundNumber) {
+        this.roundNumber = roundNumber;
     }
 
     public Double getTotalScore() {

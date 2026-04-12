@@ -65,8 +65,8 @@ public class GovernanceService {
         eventRepository.save(event);
         logAction(eventId, "EVENT", "APPROVE", actor, comments);
 
-        auditLogService.log("EVENT_APPROVED", "Event " + event.getTitle() + " approved exclusively by HOD", actor,
-                "Event", eventId);
+        auditLogService.log("EVENT_APPROVED", "Event", eventId,
+                "Event " + event.getTitle() + " approved exclusively by HOD", null);
     }
 
     @Transactional
@@ -85,8 +85,8 @@ public class GovernanceService {
         hackathonRepository.save(hackathon);
         logAction(hackathonId, "HACKATHON", "APPROVE", actor, comments);
 
-        auditLogService.log("HACKATHON_APPROVED", "Hackathon " + hackathon.getTitle() + " approved exclusively by HOD",
-                actor, "Hackathon", hackathonId);
+        auditLogService.log("HACKATHON_APPROVED", "Hackathon", hackathonId,
+                "Hackathon " + hackathon.getTitle() + " approved exclusively by HOD", null);
     }
 
     // --- 2. Judge Management (Step 3) ---
@@ -146,9 +146,8 @@ public class GovernanceService {
 
         judgeScoreRepository.save(existingScore);
 
-        auditLogService.log("SCORE_SUBMIT",
-                "Judge " + judge.getEmail() + " submitted score for submission " + submissionId, judge, "JudgeScore",
-                existingScore.getId());
+        auditLogService.log("SCORE_SUBMIT", "JudgeScore", existingScore.getId(),
+                "Judge " + judge.getEmail() + " submitted score for submission " + submissionId, null);
     }
 
     @Transactional

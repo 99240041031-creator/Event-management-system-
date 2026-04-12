@@ -23,6 +23,15 @@ public class ClubJoinRequest {
     @Column(columnDefinition = "TEXT")
     private String message;
 
+    // New fields for Recruitment System
+    private String resumeUrl;
+    private String portfolioLink;
+    
+    @Column(columnDefinition = "TEXT")
+    private String skills;
+    
+    private Integer interviewScore = 0;
+
     private String status = "PENDING"; // PENDING, APPROVED, REJECTED
 
     private LocalDateTime createdAt = LocalDateTime.now();

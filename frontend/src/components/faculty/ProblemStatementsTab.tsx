@@ -84,7 +84,7 @@ const ProblemStatementsTab = ({ hackathonId }: ProblemStatementsProps) => {
             <CardHeader>
                 <div className="flex items-center justify-between">
                     <CardTitle>Problem Statements</CardTitle>
-                    <Dialog open={isDialogOpen} onValueChange={setIsDialogOpen}>
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                         <DialogTrigger asChild>
                             <Button>
                                 <Plus className="mr-2 h-4 w-4" /> Add Problem

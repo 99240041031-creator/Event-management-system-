@@ -9,6 +9,7 @@ import java.util.List;
 @Repository
 public interface EventRegistrationRepository extends JpaRepository<EventRegistration, String> {
     List<EventRegistration> findByUserId(String userId);
+    long countByUserId(String userId);
 
     List<EventRegistration> findByEventId(String eventId);
 

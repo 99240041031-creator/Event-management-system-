@@ -10,7 +10,7 @@ Write-Host ""
 $env:JAVA_HOME = "C:\Java\jdk-17.0.14+7"
 $env:Path = "C:\Java\jdk-17.0.14+7\bin;" + $env:Path
 
-Write-Host "✅ Java 17 environment configured" -ForegroundColor Green
+Write-Host "Java 17 environment configured" -ForegroundColor Green
 Write-Host "   JAVA_HOME: $env:JAVA_HOME"
 Write-Host ""
 
@@ -22,17 +22,16 @@ Write-Host ""
 # Navigate to backend directory
 $backendPath = "c:/Event Managemnt system/smart-intercollege-event-hackathon-manager/smart-intercollege-event-hackathon-manager/backend"
 Set-Location $backendPath
-Write-Host "📁 Working directory: $backendPath" -ForegroundColor Cyan
+Write-Host "Working directory: $backendPath" -ForegroundColor Cyan
 Write-Host ""
 
 # Start Spring Boot
-# Start Spring Boot
 Write-Host "Starting Spring Boot application..." -ForegroundColor Green
 Write-Host ""
-Write-Host "Wait for 'Started EventManagerApplication' message..." -ForegroundColor Yellow
+Write-Host "Wait for Started EventManagerApplication message..." -ForegroundColor Yellow
 Write-Host "Backend will be available at: http://localhost:8080" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "Press Ctrl+C to stop the server" -ForegroundColor Yellow
+Write-Host "Press Ctrl-C to stop the server" -ForegroundColor Yellow
 Write-Host ""
 
 mvn spring-boot:run -DskipTests

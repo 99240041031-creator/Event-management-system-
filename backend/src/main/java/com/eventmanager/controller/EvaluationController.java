@@ -79,7 +79,7 @@ public class EvaluationController {
     }
 
     @GetMapping("/leaderboard/{eventId}")
-    @PreAuthorize("hasAnyRole('HOD', 'FACULTY', 'DEAN_OF_CAMPUS', 'SUPER_ADMIN', 'STUDENT')")
+    @PreAuthorize("hasAnyRole('HOD', 'FACULTY', 'DEAN_OF_CAMPUS', 'AMBASSADOR', 'STUDENT')")
     public ResponseEntity<java.util.List<Map<String, Object>>> getLeaderboard(@PathVariable String eventId) {
         return ResponseEntity.ok(leaderboardService.getLeaderboard(eventId));
     }

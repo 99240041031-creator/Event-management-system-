@@ -218,6 +218,39 @@ const StudentDashboard = () => {
         </div>
       </motion.div>
 
+      {/* Quick Actions */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+      >
+        <h2 className="mb-3 text-sm font-semibold text-slate-500 uppercase tracking-wider">Quick Actions</h2>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          {[
+            { label: 'Register Event', icon: Calendar, color: 'bg-blue-500/10 text-blue-600 hover:bg-blue-500/20', path: '/dashboard/student/events' },
+            { label: 'Join Hackathon', icon: Zap, color: 'bg-orange-500/10 text-orange-600 hover:bg-orange-500/20', path: '/dashboard/student/hackathons' },
+            { label: 'Create Team', icon: Users, color: 'bg-teal-500/10 text-teal-600 hover:bg-teal-500/20', path: '/dashboard/student/teams' },
+            { label: 'Browse Clubs', icon: Star, color: 'bg-purple-500/10 text-purple-600 hover:bg-purple-500/20', path: '/dashboard/student/clubs' },
+            { label: 'View Webinars', icon: MessageSquare, color: 'bg-pink-500/10 text-pink-600 hover:bg-pink-500/20', path: '/dashboard/student/webinars' },
+            { label: 'Certificates', icon: Award, color: 'bg-amber-500/10 text-amber-600 hover:bg-amber-500/20', path: '/dashboard/student/certificates' },
+          ].map((action, i) => (
+            <motion.button
+              key={action.label}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.05 * i }}
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => navigate(action.path)}
+              className={`flex flex-col items-center gap-2 rounded-xl p-4 text-center transition-colors ${action.color}`}
+            >
+              <action.icon className="h-6 w-6" />
+              <span className="text-xs font-semibold leading-tight">{action.label}</span>
+            </motion.button>
+          ))}
+        </div>
+      </motion.div>
+
       {/* Stats Grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, index) => (
