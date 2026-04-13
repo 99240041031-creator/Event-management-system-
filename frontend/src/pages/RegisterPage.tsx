@@ -54,7 +54,6 @@ const RegisterPage = () => {
     department: '',
     year: '',
     directorRole: '',
-    facultySubRole: '',
   });
 
   const handleNext = () => {
@@ -71,8 +70,8 @@ const RegisterPage = () => {
         toast.error('Institutional verification data missing');
         return;
       }
-      if (formData.role === 'faculty' && (!formData.collegeId || !formData.facultySubRole)) {
-        toast.error('Faculty role assignment missing');
+      if (formData.role === 'faculty' && !formData.collegeId) {
+        toast.error('Institution verification data missing');
         return;
       }
       if (formData.role === 'director' && (!formData.collegeId || !formData.directorRole)) {
@@ -105,7 +104,7 @@ const RegisterPage = () => {
         collegeId: formData.collegeId,
         department: formData.department,
         academicYear: formData.role === 'student' && formData.year ? parseInt(formData.year) : undefined,
-        facultySubRole: formData.role === 'faculty' ? formData.facultySubRole : undefined,
+        facultySubRole: undefined,
         directorRole: formData.role === 'director' ? formData.directorRole : undefined,
       });
       toast.success('Registration successful. Please login to continue.');
@@ -130,11 +129,7 @@ const RegisterPage = () => {
     { value: 'judge', label: 'Judge' }
   ];
 
-  const facultySubRoles = [
-    { value: 'faculty_member', label: 'Faculty Member' },
-    { value: 'faculty_coordinator', label: 'Faculty Coordinator' },
-    { value: 'club_head', label: 'Club Head (Advisor)' }
-  ];
+
 
   const departments = [
     'Computer Science',
@@ -317,7 +312,7 @@ const RegisterPage = () => {
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
+                    <div className={cn("space-y-2", formData.role === 'faculty' ? "col-span-2" : "col-span-1")}>
                       <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Faculty / Dept</label>
                       <Select value={formData.department} onValueChange={val => setFormData({ ...formData, department: val })}>
                         <SelectTrigger className="h-14 rounded-2xl bg-slate-50 dark:bg-slate-900 border-none font-black text-xs uppercase">
@@ -353,23 +348,7 @@ const RegisterPage = () => {
                         </>
                       )}
 
-                      {formData.role === 'faculty' && (
-                        <>
-                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Faculty Role</label>
-                          <Select value={formData.facultySubRole} onValueChange={val => setFormData({ ...formData, facultySubRole: val })}>
-                            <SelectTrigger className="h-14 rounded-2xl bg-slate-50 dark:bg-slate-900 border-none font-black text-xs uppercase">
-                              <SelectValue placeholder="SELECT ROLE..." />
-                            </SelectTrigger>
-                            <SelectContent className="bg-white dark:bg-slate-950 border-slate-100 dark:border-slate-800 rounded-2xl">
-                              {facultySubRoles.map((role) => (
-                                <SelectItem key={role.value} value={role.value} className="font-black text-xs uppercase">
-                                  {role.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </>
-                      )}
+
 
                       {formData.role === 'director' && (
                         <>

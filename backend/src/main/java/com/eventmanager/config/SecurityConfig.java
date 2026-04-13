@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -55,13 +56,16 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         // Governance & Approval (HOD/Faculty)
                         .requestMatchers("/api/governance/**")
-                        .hasAnyRole("HOD", "FACULTY", "COLLEGE_ADMIN", "AMBASSADOR")
+                        .hasAnyRole("HOD", "FACULTY", "COLLEGE_ADMIN", "SUPER_ADMIN", "DIRECTOR", "AMBASSADOR")
                         // Judge specific routes
                         .requestMatchers("/api/judge/**").hasAnyRole("JUDGE", "DIRECTOR", "HOD", "FACULTY")
                         .requestMatchers("/api/evaluation/**").hasAnyRole("JUDGE", "DIRECTOR", "HOD", "FACULTY")
+                        // HOD / Director Dashboard access
+                        .requestMatchers("/api/hod/**").hasAnyRole("HOD", "DIRECTOR", "COLLEGE_ADMIN", "SUPER_ADMIN")
                         // General API access
                         .requestMatchers("/api/clubs/**").authenticated()
                         .requestMatchers("/api/events/**").authenticated()
@@ -82,10 +86,9 @@ public class SecurityConfig {
     @Bean
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         org.springframework.web.cors.CorsConfiguration config = new org.springframework.web.cors.CorsConfiguration();
-        config.setAllowedOriginPatterns(java.util.Arrays.asList("http://localhost:[*]", "http://127.0.0.1:[*]"));
-        config.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedOrigins(java.util.Arrays.asList("*"));
+        config.setAllowedMethods(java.util.Arrays.asList("*"));
         config.setAllowedHeaders(java.util.Arrays.asList("*"));
-        config.setAllowCredentials(true);
         org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new org.springframework.web.cors.UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;

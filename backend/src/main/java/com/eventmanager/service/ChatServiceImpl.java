@@ -50,7 +50,16 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public List<ChatMessage> getMessages(String roomId) {
-        return messageRepository.findByRoomIdOrderByCreatedAtAsc(roomId);
+        List<ChatMessage> messages = messageRepository.findByRoomIdOrderByCreatedAtAsc(roomId);
+        
+        // If no messages found by UUID, try resolving as room name (for frontend labels compatibility)
+        if (messages.isEmpty()) {
+            return roomRepository.findByName(roomId)
+                    .map(room -> messageRepository.findByRoomIdOrderByCreatedAtAsc(room.getId()))
+                    .orElse(List.of());
+        }
+        
+        return messages;
     }
 
     @Override

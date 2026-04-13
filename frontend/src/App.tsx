@@ -31,7 +31,6 @@ import MyHackathonsPage from '@/pages/dashboard/MyHackathonsPage';
 import StudentProfilePage from '@/pages/dashboard/StudentProfilePage';
 import StudentHackathonDetailPage from '@/pages/dashboard/HackathonDetailPage';
 import StudentEventsDashboard from '@/pages/dashboard/StudentEventsDashboard';
-import StudentTeamsDashboard from '@/pages/dashboard/StudentTeamsDashboard';
 import TeamDetailsPage from '@/pages/dashboard/team/TeamDetailsPage';
 import StudentAnalyticsDashboard from '@/pages/dashboard/StudentAnalyticsDashboard';
 import FacultyDashboard from '@/pages/dashboard/FacultyDashboard';
@@ -44,6 +43,7 @@ import FacultyHackathonCreatePage from '@/pages/dashboard/FacultyHackathonCreate
 import FacultyAnalyticsDashboard from '@/pages/dashboard/FacultyAnalyticsDashboard';
 import FacultyStudentManagement from '@/pages/dashboard/FacultyStudentManagement';
 import FacultyResourcesPage from '@/pages/dashboard/FacultyResourcesPage';
+import TeamsPage from '@/pages/dashboard/TeamsPage';
 import FacultyWebinarsPage from '@/pages/dashboard/FacultyWebinarsPage';
 import FacultyClubsPage from '@/pages/dashboard/FacultyClubsPage';
 import FacultyClubDashboard from '@/pages/dashboard/FacultyClubDashboard';
@@ -93,12 +93,23 @@ import ApprovalCenter from '@/pages/dashboard/hod/ApprovalCenter';
 import RiskCompliance from '@/pages/dashboard/hod/RiskCompliance';
 import BudgetManagement from '@/pages/dashboard/hod/BudgetManagement';
 
+import HodApprovals from '@/pages/dashboard/hod/HodApprovals';
+import HodFacultyStatus from '@/pages/dashboard/hod/HodFacultyStatus';
+import HodStudentStatus from '@/pages/dashboard/hod/HodStudentStatus';
+import HodSyllabusTracking from '@/pages/dashboard/hod/HodSyllabusTracking';
+import HodCreditManager from '@/pages/dashboard/hod/HodCreditManager';
+
 import JudgeManagement from '@/pages/dashboard/JudgeManagement';
+<<<<<<< HEAD
 import JudgeScoringPage from '@/pages/dashboard/JudgeScoringPage';
 import RoundManagement from '@/pages/dashboard/RoundManagement';
 import RoundSubmissionsPage from '@/pages/dashboard/RoundSubmissionsPage';
 import JudgeAnalytics from '@/pages/dashboard/JudgeAnalytics';
 import Shortlisting from '@/pages/dashboard/Shortlisting';
+=======
+import JudgeTeamDetails from '@/pages/dashboard/JudgeTeamDetails';
+import JudgeEvaluationPage from '@/pages/dashboard/JudgeEvaluationPage';
+>>>>>>> main
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode; allowedRoles?: string[] }) => {
@@ -123,8 +134,9 @@ const DashboardRedirect = () => {
 
   // Prioritize Sub-Roles for specific dashboards
   if (user.subRole) {
-    switch (user.subRole) {
+    switch (user.subRole.toLowerCase()) {
       case 'hod':
+      case 'director':
         return <Navigate to="/dashboard/hod" replace />;
       case 'college_admin':
         return <Navigate to="/dashboard/college-admin" replace />;
@@ -144,14 +156,21 @@ const DashboardRedirect = () => {
   }
 
   // Fallback to Primary Role if subRole is missing or didn't match specific dashboard
+<<<<<<< HEAD
   switch (user.role) {
     case 'ambassador':
       return <Navigate to="/dashboard/ambassador" replace />;
+=======
+  switch (user.role.toLowerCase()) {
+    case 'super_admin':
+      return <Navigate to="/dashboard/super-admin" replace />;
+>>>>>>> main
     case 'dean_of_campus':
       return <Navigate to="/dashboard/dean" replace />;
     case 'college_admin':
       return <Navigate to="/dashboard/college-admin" replace />;
     case 'hod':
+    case 'director':
       return <Navigate to="/dashboard/hod" replace />;
     case 'faculty_coordinator':
       return <Navigate to="/dashboard/coordinator" replace />;
@@ -214,7 +233,7 @@ function App() {
             <Route path="/dashboard/student/my-hackathons/:id" element={<StudentHackathonDetailPage />} />
             <Route path="/dashboard/student/hackathons/:id" element={<StudentHackathonDetailPage />} />
             <Route path="/dashboard/student/events" element={<StudentEventsDashboard />} />
-            <Route path="/dashboard/student/teams" element={<StudentTeamsDashboard />} />
+            <Route path="/dashboard/teams" element={<TeamsPage />} />
             <Route path="/dashboard/student/team/:id" element={<TeamDetailsPage />} />
             <Route path="/dashboard/student/clubs" element={<ClubsPage />} />
             <Route path="/dashboard/student/clubs/:clubId" element={<ClubDetailPage />} />
@@ -278,12 +297,19 @@ function App() {
             <Route path="/dashboard/hod/risk" element={<RiskCompliance />} />
             <Route path="/dashboard/hod/budget" element={<BudgetManagement />} />
             <Route path="/dashboard/hod/scores" element={<HodScoresPage />} />
+            <Route path="/dashboard/hod/approvals-main" element={<HodApprovals />} />
+            <Route path="/dashboard/hod/faculty-status" element={<HodFacultyStatus />} />
+            <Route path="/dashboard/hod/student-status" element={<HodStudentStatus />} />
+            <Route path="/dashboard/hod/syllabus" element={<HodSyllabusTracking />} />
+            <Route path="/dashboard/hod/credits" element={<HodCreditManager />} />
             <Route path="/dashboard/hod/scores/:eventId" element={<HodScoresPage />} />
             <Route path="/dashboard/hod/judges" element={<JudgeManagement />} />
             <Route path="/dashboard/dean" element={<DeanDashboard />} />
             <Route path="/dashboard/judge" element={<JudgeDashboard />} />
+            <Route path="/dashboard/judge/evaluate" element={<JudgeEvaluationPage />} />
             <Route path="/dashboard/judge/events" element={<AssignedEvents />} />
             <Route path="/dashboard/judge/events/:eventId" element={<JudgeEventDetails />} />
+            <Route path="/judge/team/:teamId" element={<JudgeTeamDetails />} />
             <Route path="/dashboard/judge/evaluate/:submissionId" element={<EvaluationPage />} />
             <Route path="/dashboard/judge/hackathon/:hackathonId/rounds" element={<RoundManagement />} />
             <Route path="/dashboard/judge/hackathon/:hackathonId/round/:roundId/submissions" element={<RoundSubmissionsPage />} />

@@ -247,19 +247,14 @@ export const facultyApi = {
     scoreSubmission: (id: string, scoreData: any) => api.post<any>(`/faculty/hackathons/${id}/score`, scoreData),
 
     // Resources
-    getResources: () => api.get<any[]>('/faculty/resources'),
-    uploadResource: (data: FormData) => fetchAPI<any>('/faculty/resources/upload', {
-        method: 'POST',
-        body: data,
-        // Content-Type header is automatically set by browser for FormData
-        headers: {}
-    }),
-    deleteResource: (id: string) => api.delete<any>(`/faculty/resources/${id}`),
+    getResources: () => api.get<any[]>('/resources'),
+    deleteResource: (id: string) => api.delete<any>(`/resources/${id}`),
 
     // Certificates
     generateCertificates: (eventId: string, userIds: string[]) => api.post<any>('/faculty/certificates/generate', { eventId, userIds }),
     getCertificates: (page: number = 0, size: number = 10) => api.get<any>(`/faculty/certificates?page=${page}&size=${size}`),
     revokeCertificate: (id: string) => api.put<any>(`/faculty/certificates/${id}/revoke`, {}),
+    getTeams: () => api.get<any[]>('/faculty/teams'),
 };
 
 export const clubApi = {

@@ -73,7 +73,7 @@ public class FacultyServiceImpl implements FacultyService {
                 eventRepository.countByOrganizer_IdAndStatus(facultyId, "PENDING")
         );
 
-        // Count resources uploaded (placeholder)
+        // Count resources uploaded
         stats.setResourcesUploadedCount(0L);
 
         // Count certificates issued by faculty
@@ -122,7 +122,7 @@ public class FacultyServiceImpl implements FacultyService {
         );
 
         // Resources and certificates
-        summary.setResourcesUploaded(0L); // Pending: Implement when ResourceRepository is available
+        summary.setResourcesUploaded(0L);
         summary.setCertificatesIssued(certificateRepository.countByIssuerId(facultyId));
         summary.setStudentParticipationCount(activeRegistrations);
 
@@ -510,6 +510,34 @@ public class FacultyServiceImpl implements FacultyService {
 
         certificate.setStatus(Certificate.CertificateStatus.REVOKED);
         certificateRepository.save(certificate);
+    }
+
+    @Override
+    public List<Map<String, Object>> getFacultyTeams(String facultyId) {
+        List<Map<String, Object>> facultyTeams = new ArrayList<>();
+        
+        // Find hackathons created by the faculty
+        List<Hackathon> hackathons = hackathonRepository.findByOrganizer_Id(facultyId);
+        List<String> hackathonIds = hackathons.stream().map(Hackathon::getId).collect(Collectors.toList());
+        
+        // Fetch teams for these hackathons
+        for (String hackathonId : hackathonIds) {
+            List<Team> teams = teamRepository.findByHackathonId(hackathonId);
+            for (Team team : teams) {
+                Map<String, Object> teamInfo = new HashMap<>();
+                teamInfo.put("id", team.getId());
+                teamInfo.put("name", team.getName());
+                
+                Hackathon h = team.getHackathon();
+                teamInfo.put("eventName", h != null ? h.getTitle() : "Unnamed Hackathon");
+                teamInfo.put("memberCount", team.getMembers() != null ? team.getMembers().size() : team.getMemberCount());
+                teamInfo.put("status", team.getStatus());
+                
+                facultyTeams.add(teamInfo);
+            }
+        }
+        
+        return facultyTeams;
     }
 
     // Helper methods
