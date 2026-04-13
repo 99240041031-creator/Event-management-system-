@@ -89,4 +89,9 @@ public interface FacultyService {
      * Revoke a certificate
      */
     void revokeCertificate(String certificateId, String facultyId);
+    
+    /**
+     * Get all teams under faculty's events and hackathons
+     */
+    List<Map<String, Object>> getFacultyTeams(String facultyId);
 }

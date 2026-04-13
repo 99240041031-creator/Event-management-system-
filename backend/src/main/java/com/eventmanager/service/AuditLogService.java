@@ -23,31 +23,35 @@ public class AuditLogService {
     @Async
     @Transactional
     public void log(String action, String entityType, String entityId, String details, HttpServletRequest request) {
+        log(action, details, null, entityType, entityId);
+    }
+    
+    @Async
+    @Transactional
+    public void log(String action, String details, com.eventmanager.model.User actor, String entityType, String entityId) {
         try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            
             AuditLog log = new AuditLog();
             log.setAction(action);
+            log.setDetails(details);
             log.setEntityType(entityType);
             log.setEntityId(entityId);
-            log.setDetails(details);
             log.setStatus("SUCCESS");
             
-            if (auth != null && auth.isAuthenticated()) {
-                log.setUsername(auth.getName());
-                log.setUserRole(auth.getAuthorities().toString());
-                // Extract user ID from authentication if available
-                // log.setUserId(extractUserId(auth));
-            }
-            
-            if (request != null) {
-                log.setIpAddress(getClientIpAddress(request));
-                log.setUserAgent(request.getHeader("User-Agent"));
+            if (actor != null) {
+                log.setUserId(actor.getId());
+                log.setUsername(actor.getEmail());
+                log.setUserRole(actor.getRole());
+            } else {
+                Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                if (auth != null && auth.isAuthenticated()) {
+                    log.setUsername(auth.getName());
+                    log.setUserRole(auth.getAuthorities().toString());
+                }
+                log.setUserId("SYSTEM");
             }
             
             auditLogRepository.save(log);
         } catch (Exception e) {
-            // Log error but don't fail the main operation
             System.err.println("Failed to create audit log: " + e.getMessage());
         }
     }
@@ -55,24 +59,24 @@ public class AuditLogService {
     @Async
     @Transactional
     public void logFailure(String action, String entityType, String entityId, String errorMessage, HttpServletRequest request) {
+        logFailure(action, errorMessage, null, entityType, entityId);
+    }
+
+    @Async
+    @Transactional
+    public void logFailure(String action, String errorMessage, com.eventmanager.model.User actor, String entityType, String entityId) {
         try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            
             AuditLog log = new AuditLog();
             log.setAction(action);
+            log.setErrorMessage(errorMessage);
             log.setEntityType(entityType);
             log.setEntityId(entityId);
             log.setStatus("FAILURE");
-            log.setErrorMessage(errorMessage);
             
-            if (auth != null && auth.isAuthenticated()) {
-                log.setUsername(auth.getName());
-                log.setUserRole(auth.getAuthorities().toString());
-            }
-            
-            if (request != null) {
-                log.setIpAddress(getClientIpAddress(request));
-                log.setUserAgent(request.getHeader("User-Agent"));
+            if (actor != null) {
+                log.setUserId(actor.getId());
+                log.setUsername(actor.getEmail());
+                log.setUserRole(actor.getRole());
             }
             
             auditLogRepository.save(log);
@@ -105,26 +109,4 @@ public class AuditLogService {
         return request.getRemoteAddr();
     }
 
-    @Async
-    @Transactional
-    public void log(String action, String details, com.eventmanager.model.User actor, String entityType, String entityId) {
-        try {
-            AuditLog log = new AuditLog();
-            log.setAction(action);
-            log.setEntityType(entityType);
-            log.setEntityId(entityId);
-            log.setDetails(details);
-            log.setStatus("SUCCESS");
-            
-            if (actor != null) {
-                log.setUsername(actor.getName() != null ? actor.getName() : actor.getEmail());
-                log.setUserRole(actor.getRole() != null ? actor.getRole() : "UNKNOWN");
-                log.setUserId(actor.getId());
-            }
-            
-            auditLogRepository.save(log);
-        } catch (Exception e) {
-            System.err.println("Failed to create audit log: " + e.getMessage());
-        }
-    }
 }

@@ -415,4 +415,13 @@ public class FacultyController {
         
         return ResponseEntity.ok(ApiResponse.success("Certificate revoked successfully"));
     }
+    /**
+     * Get faculty teams
+     */
+    @GetMapping("/teams")
+    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getFacultyTeams(Authentication authentication) {
+        String facultyId = ((CustomUserDetails) authentication.getPrincipal()).getUser().getId();
+        List<Map<String, Object>> teams = facultyService.getFacultyTeams(facultyId);
+        return ResponseEntity.ok(ApiResponse.success(teams));
+    }
 }
