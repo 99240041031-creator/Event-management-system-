@@ -58,6 +58,12 @@ public class AuditLogService {
     
     @Async
     @Transactional
+    public void logFailure(String action, String entityType, String entityId, String errorMessage, HttpServletRequest request) {
+        logFailure(action, errorMessage, null, entityType, entityId);
+    }
+
+    @Async
+    @Transactional
     public void logFailure(String action, String errorMessage, com.eventmanager.model.User actor, String entityType, String entityId) {
         try {
             AuditLog log = new AuditLog();
@@ -102,4 +108,5 @@ public class AuditLogService {
         }
         return request.getRemoteAddr();
     }
+
 }

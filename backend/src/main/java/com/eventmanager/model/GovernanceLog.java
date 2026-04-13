@@ -12,8 +12,8 @@ public class GovernanceLog {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @ManyToOne
-    @JoinColumn(name = "target_id", nullable = false)
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "target_event_id", nullable = true)
     private Event targetEvent; // The event or hackathon being approved/reviewed
 
     @ManyToOne
@@ -124,6 +124,18 @@ public class GovernanceLog {
 
     public void setTimestamp(LocalDateTime timestamp) {
         this.createdAt = timestamp;
+    }
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "target_hackathon_id", nullable = true)
+    private Hackathon targetHackathon;
+
+    public Hackathon getTargetHackathon() {
+        return targetHackathon;
+    }
+
+    public void setTargetHackathon(Hackathon targetHackathon) {
+        this.targetHackathon = targetHackathon;
     }
 
     @Column(name = "entity_id")

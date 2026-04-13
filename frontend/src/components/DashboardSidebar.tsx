@@ -63,11 +63,14 @@ const getMenuItems = (role: string) => {
         { name: 'Event Audits', href: '/dashboard/college-admin/audits', icon: FileText },
       ];
     case 'hod':
+    case 'director':
       return [
-        { name: 'Dept. Overview', href: '/dashboard/hod', icon: LayoutDashboard },
-        { name: 'Approve Scores', href: '/dashboard/hod/scores', icon: CheckCircle },
-        { name: 'Lock Results', href: '/dashboard/hod/lock', icon: Lock },
-        { name: 'Faculty Oversight', href: '/dashboard/hod/faculty', icon: Users },
+        { name: 'Dashboard Overview', href: '/dashboard/hod', icon: LayoutDashboard },
+        { name: 'Permissions Center', href: '/dashboard/hod/approvals', icon: Shield },
+        { name: 'Faculty Tracking', href: '/dashboard/hod/faculty', icon: Users },
+        { name: 'Student Exam Status', href: '/dashboard/hod/students', icon: GraduationCap },
+        { name: 'Syllabus Tracker', href: '/dashboard/hod/syllabus', icon: BookOpen },
+        { name: 'Credits Approval', href: '/dashboard/hod/credits', icon: Award },
         { name: 'Judge Management', href: '/dashboard/hod/judges', icon: Gavel },
       ];
     case 'faculty_coordinator':

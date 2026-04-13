@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -59,10 +60,12 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
                         // Governance & Approval (HOD/Faculty)
                         .requestMatchers("/api/governance/**")
-                        .hasAnyRole("HOD", "FACULTY", "COLLEGE_ADMIN", "SUPER_ADMIN")
+                        .hasAnyRole("HOD", "FACULTY", "COLLEGE_ADMIN", "SUPER_ADMIN", "DIRECTOR")
                         // Judge specific routes
                         .requestMatchers("/api/judge/**").hasAnyRole("JUDGE", "DIRECTOR")
                         .requestMatchers("/api/evaluation/**").hasAnyRole("JUDGE", "DIRECTOR")
+                        // HOD / Director Dashboard access
+                        .requestMatchers("/api/hod/**").hasAnyRole("HOD", "DIRECTOR", "COLLEGE_ADMIN", "SUPER_ADMIN")
                         // General API access
                         .requestMatchers("/api/clubs/**").authenticated()
                         .requestMatchers("/api/events/**").authenticated()

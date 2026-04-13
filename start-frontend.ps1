@@ -1,24 +1,4 @@
-# Start Frontend Server
-# Run this script to start the frontend
-
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  STARTING FRONTEND SERVER" -ForegroundColor Cyan
-Write-Host "========================================" -ForegroundColor Cyan
-Write-Host ""
-
-# Navigate to frontend directory
-$frontendPath = "c:/Event Managemnt system/smart-intercollege-event-hackathon-manager/smart-intercollege-event-hackathon-manager/frontend"
+Write-Output "STARTING FRONTEND SERVER"
+$frontendPath = "$PSScriptRoot\frontend"
 Set-Location $frontendPath
-Write-Host "📁 Working directory: $frontendPath" -ForegroundColor Cyan
-Write-Host ""
-
-# Start Vite dev server
-# Start Vite dev server
-Write-Host "Starting Vite development server..." -ForegroundColor Green
-Write-Host ""
-Write-Host "Frontend will be available at: http://localhost:5173" -ForegroundColor Cyan
-Write-Host ""
-Write-Host "Press Ctrl+C to stop the server" -ForegroundColor Yellow
-Write-Host ""
-
 npm run dev
