@@ -9,10 +9,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/faculty")
@@ -204,6 +202,7 @@ public class FacultyClubController {
     @PostMapping("/clubs/hackathons/{id}/teams")
     public ResponseEntity<ClubHackathonTeam> registerTeam(@PathVariable String id, @RequestBody Map<String, Object> body) {
         String teamName = (String) body.get("teamName");
+        @SuppressWarnings("unchecked")
         List<String> studentIds = (List<String>) body.get("studentIds");
         return ResponseEntity.ok(clubService.registerClubHackathonTeam(id, teamName, studentIds));
     }

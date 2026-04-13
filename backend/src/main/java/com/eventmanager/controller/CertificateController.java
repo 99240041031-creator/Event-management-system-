@@ -5,7 +5,6 @@ import com.eventmanager.dto.CertificateDto;
 import com.eventmanager.model.User;
 import com.eventmanager.service.CertificateService;
 import com.eventmanager.repository.UserRepository;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -47,17 +45,6 @@ public class CertificateController {
                 .body(pdf);
     }
 
-    // Duplicate endpoint - handled by CertificateVerificationController
-    /*
-    @GetMapping("/certificates/verify/{certificateId}")
-    public ResponseEntity<ApiResponse<CertificateDto>> verifyCertificate(@PathVariable String certificateId, HttpServletRequest request) {
-        String ipAddress = request.getRemoteAddr();
-        return certificateService.verifyCertificate(certificateId, ipAddress)
-                .map(dto -> ResponseEntity.ok(ApiResponse.success(dto)))
-                .orElse(ResponseEntity.status(404).body(ApiResponse.error("Certificate not found")));
-    }
-    */
-
     @PostMapping("/certificates/seed")
     public ResponseEntity<ApiResponse<String>> seedCertificates(@RequestParam String userId) {
         try {
@@ -66,7 +53,7 @@ public class CertificateController {
         } catch (Exception e) {
             java.io.StringWriter sw = new java.io.StringWriter();
             e.printStackTrace(new java.io.PrintWriter(sw));
-            return ResponseEntity.internalServerError().body(ApiResponse.error("Seed failed: " + e.getMessage() + "\n" + sw.toString()));
+            return ResponseEntity.internalServerError().body(ApiResponse.error("Seed failed: " + e.getMessage()));
         }
     }
 
@@ -76,9 +63,7 @@ public class CertificateController {
             certificateService.seedAllCertificates();
             return ResponseEntity.ok(ApiResponse.success("Certificates seeded for all users", null));
         } catch (Exception e) {
-            java.io.StringWriter sw = new java.io.StringWriter();
-            e.printStackTrace(new java.io.PrintWriter(sw));
-            return ResponseEntity.internalServerError().body(ApiResponse.error("Global seed failed: " + e.getMessage() + "\n" + sw.toString()));
+            return ResponseEntity.internalServerError().body(ApiResponse.error("Global seed failed: " + e.getMessage()));
         }
     }
 

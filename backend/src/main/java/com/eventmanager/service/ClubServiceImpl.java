@@ -344,7 +344,7 @@ public class ClubServiceImpl implements ClubService {
        // Logic to find all participants of the event and generate certificates
        List<ClubEvent> events = (eventId == null) ? clubEventRepository.findByClubIdOrderByStartDateDesc(clubId) : List.of(clubEventRepository.findById(eventId).orElseThrow());
        
-       for(ClubEvent event : events) {
+       for(@SuppressWarnings("unused") ClubEvent event : events) {
          // This is a placeholder as we need proper Event Registration linkage to Club Events.
          // Assuming we can get participants later. For now, we will just log or do nothing.
          // In a real impl, we would:

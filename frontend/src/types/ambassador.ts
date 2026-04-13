@@ -67,6 +67,7 @@ export interface ReferralCampaign {
   targetAudience?: string;
   event?: Event;
   eventId?: string;
+  referralToken?: string;
   referralLink: string;
   status: 'ACTIVE' | 'COMPLETED' | 'PAUSED';
   clickCount: number;

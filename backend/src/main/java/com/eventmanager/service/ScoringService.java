@@ -26,12 +26,6 @@ public class ScoringService {
     private SubmissionRepository submissionRepository;
 
     @Autowired
-    private HackathonRepository hackathonRepository;
-
-    @Autowired
-    private TeamRepository teamRepository;
-
-    @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
     @Autowired
@@ -192,6 +186,7 @@ public class ScoringService {
         
         allScores.forEach(s -> {
             try {
+                @SuppressWarnings("unchecked")
                 Map<String, Integer> scores = objectMapper.readValue(s.getCriteriaScores(), Map.class);
                 scores.forEach((name, val) -> {
                     criteriaAverages.put(name, criteriaAverages.getOrDefault(name, 0.0) + val);

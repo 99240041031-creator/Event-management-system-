@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -376,6 +376,7 @@ public class FacultyController {
         String facultyId = ((CustomUserDetails) authentication.getPrincipal()).getUser().getId();
         
         String eventId = (String) request.get("eventId");
+        @SuppressWarnings("unchecked")
         List<String> userIds = (List<String>) request.get("userIds");
         
         facultyService.generateCertificates(eventId, userIds, facultyId);

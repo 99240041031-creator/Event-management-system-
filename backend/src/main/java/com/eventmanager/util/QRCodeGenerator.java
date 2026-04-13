@@ -21,7 +21,7 @@ public class QRCodeGenerator {
     private static final int QR_CODE_SIZE = 300;
     
     /**
-     * Generate QR code image (legacy method for backward compatibility)
+     * Generate QR code image (static method for quick util usage)
      */
     public static String generateQRCodeImage(String text, int width, int height) throws Exception {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();

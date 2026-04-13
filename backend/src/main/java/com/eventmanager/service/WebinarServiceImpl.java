@@ -8,13 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import com.lowagie.text.Document;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.Font;
-import com.lowagie.text.Element;
-import com.lowagie.text.pdf.PdfWriter;
-import java.io.ByteArrayOutputStream;
-import java.awt.Color;
 
 @Service
 @Transactional
@@ -247,7 +240,7 @@ public class WebinarServiceImpl implements WebinarService {
         };
 
         String[] modes = {"Online", "Offline", "Hybrid"};
-        String[] statuses = {"UPCOMING", "ONGOING", "COMPLETED"};
+
 
         Random random = new Random();
 

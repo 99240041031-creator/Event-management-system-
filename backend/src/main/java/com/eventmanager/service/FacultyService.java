@@ -1,7 +1,14 @@
 package com.eventmanager.service;
 
-import com.eventmanager.dto.*;
-import com.eventmanager.model.*;
+import com.eventmanager.dto.AnalyticsDto;
+import com.eventmanager.dto.DashboardSummaryDto;
+import com.eventmanager.dto.EventRegistrationDto;
+import com.eventmanager.dto.FacultyStatsDto;
+import com.eventmanager.dto.LeaderboardEntryDto;
+import com.eventmanager.dto.StudentAnalyticsDto;
+import com.eventmanager.model.Certificate;
+import com.eventmanager.model.Event;
+import com.eventmanager.model.Hackathon;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

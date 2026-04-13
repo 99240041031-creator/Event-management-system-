@@ -1,6 +1,6 @@
 package com.eventmanager.controller;
 
-import com.eventmanager.model.ReferralCampaign;
+
 import com.eventmanager.model.User;
 import com.eventmanager.repository.UserRepository;
 import com.eventmanager.service.AmbassadorService;

@@ -4,7 +4,6 @@ import com.eventmanager.dto.ApiResponse;
 import com.eventmanager.dto.EventTeamMemberDto;
 import com.eventmanager.model.Event;
 import com.eventmanager.model.EventTeam;
-import com.eventmanager.model.TeamRole;
 import com.eventmanager.model.User;
 import com.eventmanager.repository.EventRepository;
 import com.eventmanager.repository.EventTeamRepository;

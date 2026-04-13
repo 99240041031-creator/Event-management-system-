@@ -1,17 +1,34 @@
 package com.eventmanager.service;
 
-import com.eventmanager.model.*;
-import com.eventmanager.repository.*;
+import com.eventmanager.model.Hackathon;
+import com.eventmanager.model.HackathonResult;
+import com.eventmanager.model.ProblemStatement;
+import com.eventmanager.model.Team;
+import com.eventmanager.model.TeamMember;
+import com.eventmanager.model.User;
+import com.eventmanager.repository.HackathonRepository;
+import com.eventmanager.repository.HackathonResultRepository;
+import com.eventmanager.repository.ProblemStatementRepository;
+import com.eventmanager.repository.TeamMemberRepository;
+import com.eventmanager.repository.TeamRepository;
+import com.eventmanager.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import jakarta.persistence.criteria.Predicate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class HackathonServiceImpl implements HackathonService {
+
     private final HackathonRepository hackathonRepository;
     private final TeamRepository teamRepository;
     private final TeamMemberRepository teamMemberRepository;
@@ -60,9 +77,9 @@ public class HackathonServiceImpl implements HackathonService {
     }
 
     @Override
-    public org.springframework.data.domain.Page<Hackathon> getHackathons(String search, String country, String mode, String status, List<String> tags, org.springframework.data.domain.Pageable pageable) {
+    public Page<Hackathon> getHackathons(String search, String country, String mode, String status, List<String> tags, Pageable pageable) {
         return hackathonRepository.findAll((root, query, cb) -> {
-            java.util.List<jakarta.persistence.criteria.Predicate> predicates = new java.util.ArrayList<>();
+            List<Predicate> predicates = new ArrayList<>();
             if (search != null && !search.isEmpty()) {
                 String likeSearch = "%" + search.toLowerCase() + "%";
                 predicates.add(cb.like(cb.lower(root.get("title")), likeSearch));
@@ -76,7 +93,7 @@ public class HackathonServiceImpl implements HackathonService {
             if (status != null && !status.isEmpty()) {
                 predicates.add(cb.equal(cb.lower(root.get("status")), status.toLowerCase()));
             }
-            return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
+            return cb.and(predicates.toArray(new Predicate[0]));
         }, pageable);
     }
 
@@ -85,7 +102,7 @@ public class HackathonServiceImpl implements HackathonService {
         return teamMemberRepository.findByUserId(userId).stream()
                 .map(tm -> tm.getTeam().getHackathon())
                 .distinct()
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -97,14 +114,14 @@ public class HackathonServiceImpl implements HackathonService {
     public List<Hackathon> getRegisteredHackathons(String userId) {
         return getHackathonsByStudent(userId).stream()
                 .filter(h -> !h.getStatus().equalsIgnoreCase("COMPLETED"))
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<Hackathon> getCompletedHackathons(String userId) {
         return getHackathonsByStudent(userId).stream()
                 .filter(h -> h.getStatus().equalsIgnoreCase("COMPLETED"))
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -190,7 +207,7 @@ public class HackathonServiceImpl implements HackathonService {
     public List<Team> getTeamsByStudent(String userId) {
         return teamMemberRepository.findByUserId(userId).stream()
                 .map(TeamMember::getTeam)
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -254,11 +271,10 @@ public class HackathonServiceImpl implements HackathonService {
         // Simple logic: return some hackathons that the user is not part of
         // In production, this would use ML models or skill matching
         List<Hackathon> all = hackathonRepository.findAll();
-        // Return 3 random hackathons (simplified) for recommendation
         return all.stream()
                 .filter(h -> !"COMPLETED".equals(h.getStatus()))
                 .limit(3)
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -273,7 +289,7 @@ public class HackathonServiceImpl implements HackathonService {
         int count = 0;
         for (Hackathon h : hackathons) {
             if (count >= 3) break;
-            
+
             Optional<Team> existing = getTeamByUser(h.getId(), userId);
             if (existing.isEmpty() && !"COMPLETED".equalsIgnoreCase(h.getStatus())) {
                 try {

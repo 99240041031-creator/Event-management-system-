@@ -14,9 +14,10 @@ public interface CertificateService {
     Optional<CertificateDto> verifyCertificate(String certificateId, String ipAddress);
 
     List<CertificateDto> getUserCertificates(String userId);
-    
+
     CertificateDto getCertificateById(String id, String userId);
-    
+
     void seedCertificateData(String userId);
+
     void seedAllCertificates();
 }

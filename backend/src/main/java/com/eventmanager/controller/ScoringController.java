@@ -41,6 +41,7 @@ public class ScoringController {
     public ResponseEntity<JudgeScore> submitScore(@RequestBody Map<String, Object> payload) throws JsonProcessingException {
         String submissionId = (String) payload.get("submissionId");
         String roundId = (String) payload.get("roundId");
+        @SuppressWarnings("unchecked")
         Map<String, Integer> criteriaScores = (Map<String, Integer>) payload.get("criteriaScores");
         String feedback = (String) payload.get("feedback");
         boolean isFinal = (boolean) payload.get("isFinal");

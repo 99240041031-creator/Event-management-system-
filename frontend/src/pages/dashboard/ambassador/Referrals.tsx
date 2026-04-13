@@ -68,9 +68,12 @@ export default function Referrals() {
       <div className="grid gap-8 md:grid-cols-4">
          {[
            { label: 'Verified Signatures', val: campaigns.length, icon: Shield, color: 'text-indigo-400', bg: 'bg-indigo-400/10' },
-           { label: 'Signal Hits', val: campaigns.reduce((acc, c) => acc + (c.clicks || 0), 0), icon: Zap, color: 'text-amber-400', bg: 'bg-amber-400/10' },
-           { label: 'Node Conversions', val: campaigns.reduce((acc, c) => acc + (c.conversions || 0), 0), icon: UserCheck, color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
-           { label: 'Aggregate Yield', val: `${campaigns.length > 0 ? Math.floor(campaigns.reduce((acc, c) => acc + (c.conversionRate || 0), 0) / campaigns.length) : 0}%`, icon: TrendingUp, color: 'text-rose-400', bg: 'bg-rose-400/10' }
+           { label: 'Signal Hits', val: campaigns.reduce((acc, c) => acc + (c.clickCount || 0), 0), icon: Zap, color: 'text-amber-400', bg: 'bg-amber-400/10' },
+           { label: 'Node Conversions', val: campaigns.reduce((acc, c) => acc + (c.registrationCount || 0), 0), icon: UserCheck, color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
+           { label: 'Aggregate Yield', val: `${campaigns.length > 0 ? Math.floor(campaigns.reduce((acc, c) => {
+             const rate = c.clickCount && c.clickCount > 0 ? (c.registrationCount / c.clickCount) * 100 : 0;
+             return acc + rate;
+           }, 0) / campaigns.length) : 0}%`, icon: TrendingUp, color: 'text-rose-400', bg: 'bg-rose-400/10' }
          ].map((stat, i) => (
            <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
               <Card className="bg-slate-900/40 border-slate-800/60 backdrop-blur-xl rounded-[3rem] overflow-hidden group hover:border-indigo-500/40 transition-all duration-500 relative shadow-2xl">
@@ -179,7 +182,7 @@ export default function Referrals() {
                 <div className="flex justify-between items-start">
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <CardTitle className="text-3xl font-black uppercase tracking-tighter text-white italic leading-none">{camp.title}</CardTitle>
+                      <CardTitle className="text-3xl font-black uppercase tracking-tighter text-white italic leading-none">{camp.name}</CardTitle>
                       <Badge className="bg-emerald-500/10 text-emerald-400 text-[9px] font-black uppercase tracking-widest border border-emerald-500/20 px-3 py-1 rounded-full italic shadow-lg shadow-emerald-500/5">Active</Badge>
                     </div>
                     <CardDescription className="text-[11px] font-bold text-slate-500 uppercase tracking-widest italic">{camp.targetAudience}</CardDescription>
@@ -192,10 +195,10 @@ export default function Referrals() {
 
               <CardContent className="p-12 pt-6 space-y-10 relative z-10">
                 <div className="grid grid-cols-3 gap-4">
-                  {[
-                    { label: 'Signals', val: camp.clicks || 0, icon: MousePointer2, color: 'text-indigo-400', bg: 'bg-indigo-400/10' },
-                    { label: 'Nodes', val: camp.conversions || 0, icon: UserCheck, color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
-                    { label: 'Yield', val: `${camp.conversionRate || 0}%`, icon: TrendingUp, color: 'text-rose-400', bg: 'bg-rose-400/10' }
+                   {[
+                    { label: 'Signals', val: camp.clickCount || 0, icon: MousePointer2, color: 'text-indigo-400', bg: 'bg-indigo-400/10' },
+                    { label: 'Nodes', val: camp.registrationCount || 0, icon: UserCheck, color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
+                    { label: 'Yield', val: `${camp.clickCount && camp.clickCount > 0 ? Math.round((camp.registrationCount / camp.clickCount) * 100) : 0}%`, icon: TrendingUp, color: 'text-rose-400', bg: 'bg-rose-400/10' }
                   ].map((metric, i) => (
                     <div key={i} className="p-6 rounded-[2.2rem] bg-slate-950/80 flex flex-col items-center justify-center border border-slate-800/80 group-hover:border-slate-700 transition-colors shadow-inner">
                       <metric.icon className={`h-6 w-6 mb-4 text-slate-700 group-hover:${metric.color} transition-colors`} />
@@ -207,7 +210,7 @@ export default function Referrals() {
 
                 <div className="flex gap-4">
                   <Button 
-                    onClick={() => handleCopy(camp.code, camp.id)}
+                    onClick={() => handleCopy(camp.referralToken || '', camp.id)}
                     className="flex-1 h-20 rounded-[2.5rem] bg-white text-slate-900 hover:bg-slate-100 transition-all font-black uppercase tracking-[0.2em] text-[10px] gap-4 shadow-3xl shadow-indigo-900/10 border-0 group/copy overflow-hidden relative"
                   >
                     <div className="absolute inset-0 bg-indigo-500 opacity-0 group-hover/copy:opacity-5 transition-opacity" />
@@ -236,7 +239,7 @@ export default function Referrals() {
               <div className="h-3 w-full bg-slate-950/80 relative overflow-hidden border-t border-slate-800">
                 <motion.div 
                    initial={{ width: 0 }}
-                   animate={{ width: `${camp.conversionRate || 0}%` }}
+                   animate={{ width: `${camp.clickCount && camp.clickCount > 0 ? (camp.registrationCount / camp.clickCount) * 100 : 0}%` }}
                    transition={{ duration: 2, ease: "easeOut" }}
                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-indigo-600 via-sky-400 to-emerald-400 shadow-[0_0_15px_rgba(99,102,241,0.5)]" 
                 />

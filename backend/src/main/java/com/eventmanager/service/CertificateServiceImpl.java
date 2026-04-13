@@ -2,10 +2,7 @@ package com.eventmanager.service;
 
 import com.eventmanager.dto.CertificateDto;
 import com.eventmanager.model.*;
-import com.eventmanager.repository.CertificateRepository;
-import com.eventmanager.repository.EventRepository;
-import com.eventmanager.repository.UserRepository;
-import com.eventmanager.repository.VerificationLogRepository;
+import com.eventmanager.repository.*;
 import com.eventmanager.util.QRCodeGenerator;
 import com.lowagie.text.*;
 import com.lowagie.text.Font;
@@ -35,7 +32,7 @@ public class CertificateServiceImpl implements CertificateService {
     private UserRepository userRepository;
 
     @Autowired
-    private com.eventmanager.repository.HackathonRepository hackathonRepository;
+    private HackathonRepository hackathonRepository;
 
     @Autowired
     private VerificationLogRepository verificationLogRepository;
@@ -50,10 +47,12 @@ public class CertificateServiceImpl implements CertificateService {
         certificate.setEvent(event);
         certificate.setTitle(event.getTitle());
         certificate.setCategory(category);
+        
         String fullName = (user.getFirstName() != null ? user.getFirstName() : "") + " " + 
                          (user.getLastName() != null ? user.getLastName() : "");
         if (fullName.trim().isEmpty()) fullName = user.getName();
         certificate.setStudentName(fullName != null ? fullName : "Student");
+        
         certificate.setRole(role);
         certificate.setIssuedAt(LocalDateTime.now());
         certificate.setCertificateId("CERT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
@@ -80,10 +79,12 @@ public class CertificateServiceImpl implements CertificateService {
         certificate.setHackathon(hackathon);
         certificate.setTitle(hackathon.getTitle());
         certificate.setCategory(category);
+        
         String fullName = (user.getFirstName() != null ? user.getFirstName() : "") + " " + 
                          (user.getLastName() != null ? user.getLastName() : "");
         if (fullName.trim().isEmpty()) fullName = user.getName();
         certificate.setStudentName(fullName != null ? fullName : "Student");
+        
         certificate.setRole(role);
         certificate.setIssuedAt(LocalDateTime.now());
         certificate.setCertificateId("CERT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
@@ -129,18 +130,9 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Override
     public List<CertificateDto> getUserCertificates(String userId) {
-        System.out.println("Fetching certificates for user: " + userId);
-        try {
-            List<Certificate> certs = certificateRepository.findByUserId(userId);
-            System.out.println("Found " + certs.size() + " certificates");
-            return certs.stream()
-                    .map(this::convertToDto)
-                    .collect(Collectors.toList());
-        } catch (Exception e) {
-            System.err.println("Error fetching certificates: " + e.getMessage());
-            e.printStackTrace();
-            throw e;
-        }
+        return certificateRepository.findByUserId(userId).stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -161,6 +153,7 @@ public class CertificateServiceImpl implements CertificateService {
         dto.setCertificateId(cert.getCertificateId());
         dto.setStudentId(cert.getUser().getId());
         dto.setStudentName(cert.getStudentName());
+        
         if (cert.getEvent() != null) {
             dto.setEventId(cert.getEvent().getId());
             dto.setEventTitle(cert.getEvent().getTitle());
@@ -168,6 +161,7 @@ public class CertificateServiceImpl implements CertificateService {
             dto.setEventId(cert.getHackathon().getId());
             dto.setEventTitle(cert.getHackathon().getTitle());
         }
+        
         dto.setCategory(cert.getCategory());
         dto.setRole(cert.getRole());
         dto.setIssuedAt(cert.getIssuedAt());
@@ -183,13 +177,11 @@ public class CertificateServiceImpl implements CertificateService {
             PdfWriter.getInstance(document, out);
             document.open();
 
-            // Font styles
             Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 36, Color.DARK_GRAY);
             Font nameFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 48, new Color(41, 128, 185));
             Font subTitleFont = FontFactory.getFont(FontFactory.HELVETICA, 18, Color.GRAY);
             Font certIdFont = FontFactory.getFont(FontFactory.HELVETICA, 12, Color.LIGHT_GRAY);
 
-            // Add Border
             document.add(new Paragraph("\n"));
             
             Paragraph title = new Paragraph("CERTIFICATE OF COMPLETION", titleFont);
@@ -216,7 +208,6 @@ public class CertificateServiceImpl implements CertificateService {
 
             document.add(new Paragraph("\n\n"));
 
-            // Add QR Code
             if (cert.getQrCodeUrl() != null && !cert.getQrCodeUrl().isEmpty()) {
                 String base64Data = cert.getQrCodeUrl().split(",")[1];
                 byte[] qrBytes = java.util.Base64.getDecoder().decode(base64Data);
@@ -239,9 +230,7 @@ public class CertificateServiceImpl implements CertificateService {
 
     @Override
     public void seedCertificateData(String userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        
-        // Find or create an event
+        // Verification is handled inside generate methods
         Event event = eventRepository.findAll().stream().findFirst().orElseGet(() -> {
             Event e = new Event();
             e.setTitle("Introduction to Tech Excellence");
@@ -249,7 +238,6 @@ public class CertificateServiceImpl implements CertificateService {
             return eventRepository.save(e);
         });
 
-        // Find or create a hackathon
         Hackathon hackathon = hackathonRepository.findAll().stream().findFirst().orElseGet(() -> {
             Hackathon h = new Hackathon();
             h.setTitle("Global Innovation Hackathon 2024");
@@ -257,7 +245,6 @@ public class CertificateServiceImpl implements CertificateService {
             return hackathonRepository.save(h);
         });
 
-        // Generate certificates
         generateCertificate(userId, event.getId(), "workshop", "Participant");
         generateHackathonCertificate(userId, hackathon.getId(), "hackathon", "Winner");
     }
@@ -268,7 +255,7 @@ public class CertificateServiceImpl implements CertificateService {
             try {
                 seedCertificateData(user.getId());
             } catch (Exception e) {
-                System.err.println("Failed to seed for user " + user.getName() + ": " + e.getMessage());
+                // Silently skip if seeding fails for one user
             }
         });
     }

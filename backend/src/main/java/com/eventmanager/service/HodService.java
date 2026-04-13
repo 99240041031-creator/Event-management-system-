@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,8 +27,7 @@ public class HodService {
     @Autowired
     private DepartmentHealthRepository departmentHealthRepository;
 
-    @Autowired
-    private DepartmentBudgetRepository departmentBudgetRepository;
+
 
     @Autowired
     private ApprovalRequestRepository approvalRequestRepository;
@@ -107,6 +105,12 @@ public class HodService {
                 break;
             case CLUB:
                 clubRepository.findById(id).ifPresent(c -> { c.setStatus(status); clubRepository.save(c); });
+                break;
+            case BUDGET:
+                // Pending: Update budget allocation status if BUDGET model is extended with status
+                break;
+            case CREDIT:
+                // Pending: Update student reward/credit status if CREDIT model is extended with status
                 break;
         }
     }

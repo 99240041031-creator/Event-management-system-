@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, Trophy, Award, CheckCircle, Zap, 
   TrendingUp, TrendingDown, QrCode, Share2, Filter, ShieldCheck, 
-  Copy, Coins, Clock, Target, Building2, Terminal,
+  Copy, Coins, Clock, Target, Building2, Terminal, Radio, Download, FileText,
   Activity, Globe, Lock, LayoutGrid, Box, ArrowUpRight
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';

@@ -3,11 +3,9 @@ package com.eventmanager.controller;
 import com.eventmanager.dto.*;
 import com.eventmanager.service.ChatService;
 import com.eventmanager.service.TeamService;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

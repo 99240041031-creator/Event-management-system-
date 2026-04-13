@@ -27,9 +27,6 @@ public class ReferralTrackingService {
     private AmbassadorNotificationService notificationService;
     
     @Autowired
-    private FraudDetectionService fraudDetectionService;
-    
-    @Autowired
     private RewardCalculationService rewardService;
     
     @Autowired

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ClubManagementService {
@@ -19,8 +18,7 @@ public class ClubManagementService {
     @Autowired
     private ClubMembershipRepository clubMembershipRepository;
 
-    @Autowired
-    private ClubJoinRequestRepository clubJoinRequestRepository;
+
 
     @Autowired
     private ClubEventRepository clubEventRepository;

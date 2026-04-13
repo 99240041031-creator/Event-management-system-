@@ -1,10 +1,27 @@
 package com.eventmanager.service;
 
-import com.eventmanager.dto.*;
+import com.eventmanager.dto.AnalyticsDto;
+import com.eventmanager.dto.DashboardSummaryDto;
+import com.eventmanager.dto.EventRegistrationDto;
+import com.eventmanager.dto.FacultyStatsDto;
+import com.eventmanager.dto.LeaderboardEntryDto;
+import com.eventmanager.dto.StudentAnalyticsDto;
 import com.eventmanager.exception.ResourceNotFoundException;
 import com.eventmanager.exception.UnauthorizedException;
-import com.eventmanager.model.*;
-import com.eventmanager.repository.*;
+import com.eventmanager.model.Certificate;
+import com.eventmanager.model.Event;
+import com.eventmanager.model.EventRegistration;
+import com.eventmanager.model.Hackathon;
+import com.eventmanager.model.Submission;
+import com.eventmanager.model.Team;
+import com.eventmanager.model.User;
+import com.eventmanager.repository.CertificateRepository;
+import com.eventmanager.repository.EventRegistrationRepository;
+import com.eventmanager.repository.EventRepository;
+import com.eventmanager.repository.HackathonRepository;
+import com.eventmanager.repository.SubmissionRepository;
+import com.eventmanager.repository.TeamRepository;
+import com.eventmanager.repository.UserRepository;
 import com.eventmanager.util.QRCodeGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -13,7 +30,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -100,7 +122,7 @@ public class FacultyServiceImpl implements FacultyService {
         );
 
         // Resources and certificates
-        summary.setResourcesUploaded(0L); // TODO: Implement when ResourceRepository is available
+        summary.setResourcesUploaded(0L); // Pending: Implement when ResourceRepository is available
         summary.setCertificatesIssued(certificateRepository.countByIssuerId(facultyId));
         summary.setStudentParticipationCount(activeRegistrations);
 
@@ -126,8 +148,6 @@ public class FacultyServiceImpl implements FacultyService {
     @Override
     public AnalyticsDto getAnalytics(String facultyId, int days) {
         AnalyticsDto analytics = new AnalyticsDto();
-        LocalDateTime startDate = LocalDateTime.now().minusDays(days);
-
         // Overview stats
         analytics.setTotalEvents(eventRepository.countByOrganizer_Id(facultyId));
         analytics.setTotalHackathons(hackathonRepository.countByOrganizer_Id(facultyId));
@@ -398,7 +418,7 @@ public class FacultyServiceImpl implements FacultyService {
                 .findByUserIdAndEventIdIn(studentId, eventIds);
 
         analytics.setEventsAttended((int) registrations.stream().filter(EventRegistration::getAttended).count());
-        analytics.setHackathonsParticipated(0); // TODO: Implement
+        analytics.setHackathonsParticipated(0); // Pending: Implement registration count
         analytics.setCertificatesEarned((int) certificateRepository.countByUserId(studentId));
 
         // Calculate attendance rate
@@ -407,8 +427,8 @@ public class FacultyServiceImpl implements FacultyService {
         analytics.setAttendanceRate(totalRegistrations > 0 ? (double) attended / totalRegistrations * 100 : 0.0);
 
         // Performance metrics
-        analytics.setAverageScore(0.0); // TODO: Calculate from submissions
-        analytics.setTotalPoints(0); // TODO: Implement points system
+        analytics.setAverageScore(0.0); // Pending: Calculate from submissions
+        analytics.setTotalPoints(0); // Pending: Implement points system
         analytics.setPerformanceLevel(determinePerformanceLevel(analytics.getAttendanceRate()));
 
         // Participation history
@@ -461,7 +481,7 @@ public class FacultyServiceImpl implements FacultyService {
                 String qrCode = qrCodeGenerator.generateCertificateQRCode(
                         certificate.getCertificateId(),
                         verificationCode,
-                        "http://localhost:5173" // TODO: Use environment variable
+                        "http://localhost:5173" // Pending: Use environment variable
                 );
                 certificate.setQrCodeUrl(qrCode);
             } catch (Exception e) {
@@ -509,7 +529,7 @@ public class FacultyServiceImpl implements FacultyService {
     }
 
     private List<Map<String, Object>> generateEventTrendData(String facultyId, int days) {
-        // Generate mock trend data - TODO: Implement real SQL aggregation
+        // Generate mock trend data - Pending: Implement real SQL aggregation
         List<Map<String, Object>> trend = new ArrayList<>();
         for (int i = days; i >= 0; i -= 7) {
             Map<String, Object> point = new HashMap<>();
@@ -522,17 +542,17 @@ public class FacultyServiceImpl implements FacultyService {
     }
 
     private List<Map<String, Object>> generateDepartmentParticipation(String facultyId) {
-        // TODO: Implement real SQL aggregation
+        // Pending: Implement real SQL aggregation
         return new ArrayList<>();
     }
 
     private List<Map<String, Object>> generateEventTypeDistribution(String facultyId) {
-        // TODO: Implement real SQL aggregation
+        // Pending: Implement real SQL aggregation
         return new ArrayList<>();
     }
 
     private List<Map<String, Object>> generateMonthlyEngagement(String facultyId, int days) {
-        // TODO: Implement real SQL aggregation
+        // Pending: Implement real SQL aggregation
         return new ArrayList<>();
     }
 

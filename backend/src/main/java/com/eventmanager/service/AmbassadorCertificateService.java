@@ -2,7 +2,6 @@ package com.eventmanager.service;
 
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.PdfWriter;
-import com.lowagie.text.pdf.PdfContentByte;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
@@ -19,7 +18,7 @@ public class AmbassadorCertificateService {
     public byte[] generateAmbassadorCertificate(User ambassador, Integer rank, Integer totalReferrals) throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Document document = new Document(PageSize.A4.rotate());
-        PdfWriter writer = PdfWriter.getInstance(document, out);
+        PdfWriter.getInstance(document, out);
         
         document.open();
         
