@@ -17,4 +17,5 @@ public interface HackathonRepository extends JpaRepository<Hackathon, String>, J
 
     List<Hackathon> findByDepartment_Id(String departmentId);
     long countByDepartment_IdAndStatus(String departmentId, String status);
+    long countByCollege_Id(String collegeId);
 }

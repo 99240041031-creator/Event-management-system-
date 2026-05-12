@@ -30,6 +30,9 @@ class ScoringServiceTest {
     @Mock
     private SimpMessagingTemplate messagingTemplate;
 
+    @Mock
+    private ScoringAuditLogRepository auditLogRepository;
+
     @InjectMocks
     private ScoringService scoringService;
 
