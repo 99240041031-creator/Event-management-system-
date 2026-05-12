@@ -126,18 +126,11 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     public Map<String, Object> getCollegeAdminStats(String collegeId) {
         Map<String, Object> stats = new HashMap<>();
 
-        long studentCount = userRepository.findAll().stream()
-                .filter(u -> "student".equals(u.getRole())
-                        && collegeId.equals(u.getCollege() != null ? u.getCollege().getId() : null))
-                .count();
+        long studentCount = userRepository.countByRoleAndCollege_Id("student", collegeId);
 
-        long eventCount = eventRepository.findAll().stream()
-                .filter(e -> collegeId.equals(e.getCollege() != null ? e.getCollege().getId() : null))
-                .count();
+        long eventCount = eventRepository.countByCollege_Id(collegeId);
 
-        long hackathonCount = hackathonRepository.findAll().stream()
-                .filter(h -> collegeId.equals(h.getCollege() != null ? h.getCollege().getId() : null))
-                .count();
+        long hackathonCount = hackathonRepository.countByCollege_Id(collegeId);
 
         stats.put("totalStudents", studentCount);
         stats.put("totalEvents", eventCount);
@@ -170,21 +163,14 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             collegeStats.put("name", college.getName());
             collegeStats.put("logo", college.getLogo());
 
-            long studentCount = userRepository.findAll().stream()
-                    .filter(u -> "student".equals(u.getRole())
-                            && college.getId().equals(u.getCollege() != null ? u.getCollege().getId() : null))
-                    .count();
+            long studentCount = userRepository.countByRoleAndCollege_Id("student", college.getId());
             collegeStats.put("studentCount", studentCount);
 
             Map<String, Object> stats = new HashMap<>();
             stats.put("engagementScore", (int) (Math.random() * 1000));
 
-            long hackathons = hackathonRepository.findAll().stream()
-                    .filter(h -> college.getId().equals(h.getCollege() != null ? h.getCollege().getId() : null))
-                    .count();
-            long events = eventRepository.findAll().stream()
-                    .filter(e -> college.getId().equals(e.getCollege() != null ? e.getCollege().getId() : null))
-                    .count();
+            long hackathons = hackathonRepository.countByCollege_Id(college.getId());
+            long events = eventRepository.countByCollege_Id(college.getId());
 
             stats.put("totalHackathons", hackathons);
             stats.put("totalEvents", events);

@@ -19,6 +19,7 @@ public interface EventRepository extends JpaRepository<Event, String> {
 
     List<Event> findByDepartment_Id(String departmentId);
     long countByDepartment_IdAndStatus(String departmentId, String status);
+    long countByCollege_Id(String collegeId);
     
     @org.springframework.data.jpa.repository.Query("SELECT COUNT(e) FROM Event e WHERE e.organizer.id = :facultyId")
     long countByFacultyId(String facultyId);

@@ -17,6 +17,7 @@ public class Roles {
     public static final String AMBASSADOR = "AMBASSADOR";
     public static final String JUDGE = "JUDGE";
     public static final String DEAN_OF_CAMPUS = "DEAN_OF_CAMPUS"; // Keeping for backward compat if needed
+    public static final String SUPER_ADMIN = "SUPER_ADMIN";
 
     // Spring Security Authorities
     public static final String ROLE_STUDENT = "ROLE_STUDENT";
@@ -32,4 +33,5 @@ public class Roles {
     public static final String ROLE_AMBASSADOR = "ROLE_AMBASSADOR";
     public static final String ROLE_JUDGE = "ROLE_JUDGE";
     public static final String ROLE_DEAN_OF_CAMPUS = "ROLE_DEAN_OF_CAMPUS";
+    public static final String ROLE_SUPER_ADMIN = "ROLE_SUPER_ADMIN";
 }
