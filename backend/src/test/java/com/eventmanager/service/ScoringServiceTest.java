@@ -3,6 +3,7 @@ package com.eventmanager.service;
 import com.eventmanager.model.*;
 import com.eventmanager.repository.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.mockito.ArgumentMatcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -29,6 +30,9 @@ class ScoringServiceTest {
 
     @Mock
     private SimpMessagingTemplate messagingTemplate;
+
+    @Mock
+    private ScoringAuditLogRepository auditLogRepository;
 
     @InjectMocks
     private ScoringService scoringService;
