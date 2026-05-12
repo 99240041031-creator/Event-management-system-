@@ -6,8 +6,11 @@ import com.eventmanager.model.EventRegistration;
 import com.eventmanager.repository.EventRepository;
 import com.eventmanager.repository.EventRegistrationRepository;
 import com.eventmanager.repository.UserRepository;
+import com.eventmanager.security.Roles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
@@ -41,22 +44,29 @@ public class EventController {
 
     // Register for an event
     @PostMapping("/{eventId}/register")
-    public ResponseEntity<ApiResponse<String>> registerForEvent(@PathVariable String eventId, @RequestParam String userId) {
+    public ResponseEntity<ApiResponse<String>> registerForEvent(
+            @PathVariable String eventId,
+            @RequestParam(required = false) String userId,
+            @AuthenticationPrincipal UserDetails userDetails) {
         if (!eventRepository.existsById(eventId)) {
             return ResponseEntity.status(404).body(ApiResponse.error("Event not found"));
         }
-        
-        com.eventmanager.model.User user = userRepository.findById(userId).orElse(null);
+
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body(ApiResponse.error("Unauthorized"));
+        }
+
+        com.eventmanager.model.User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);
         if (user == null) {
             return ResponseEntity.badRequest().body(ApiResponse.error("User not found"));
         }
 
         Event event = eventRepository.findById(eventId).get();
-        
+
         // Check if already registered
         boolean alreadyRegistered = eventRegistrationRepository.findByEventId(eventId).stream()
-            .anyMatch(r -> r.getUser().getId().equals(userId));
-            
+                .anyMatch(r -> r.getUser().getId().equals(user.getId()));
+
         if (alreadyRegistered) {
             return ResponseEntity.badRequest().body(ApiResponse.error("Already registered"));
         }
@@ -102,11 +112,23 @@ public class EventController {
     }
 
     @PostMapping("/{eventId}/unregister")
-    public ResponseEntity<ApiResponse<String>> unregisterFromEvent(@PathVariable String eventId, @RequestParam String userId) {
+    public ResponseEntity<ApiResponse<String>> unregisterFromEvent(
+            @PathVariable String eventId,
+            @RequestParam(required = false) String userId,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body(ApiResponse.error("Unauthorized"));
+        }
+
+        com.eventmanager.model.User user = userRepository.findByEmail(userDetails.getUsername()).orElse(null);
+        if (user == null) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("User not found"));
+        }
+
         EventRegistration registration = eventRegistrationRepository.findByEventId(eventId).stream()
-            .filter(r -> r.getUser().getId().equals(userId))
-            .findFirst()
-            .orElse(null);
+                .filter(r -> r.getUser().getId().equals(user.getId()))
+                .findFirst()
+                .orElse(null);
 
         if (registration == null) {
             return ResponseEntity.badRequest().body(ApiResponse.error("Not registered"));
@@ -125,17 +147,38 @@ public class EventController {
     }
 
     @PostMapping("/{eventId}/attendance")
-    public ResponseEntity<ApiResponse<String>> markAttendance(@PathVariable String eventId, @RequestParam String userId) {
-        EventRegistration registration = eventRegistrationRepository.findByEventId(eventId).stream()
-            .filter(r -> r.getUser().getId().equals(userId))
-            .findFirst()
-            .orElse(null);
+    public ResponseEntity<ApiResponse<String>> markAttendance(
+            @PathVariable String eventId,
+            @RequestParam String userId,
+            @AuthenticationPrincipal UserDetails userDetails) {
 
-        if (registration == null) return ResponseEntity.badRequest().body(ApiResponse.error("Not registered"));
+        if (userDetails == null) {
+            return ResponseEntity.status(401).body(ApiResponse.error("Unauthorized"));
+        }
+
+        // Only Faculty, HOD, Director or Admin can mark attendance
+        boolean hasPermission = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals(Roles.ROLE_FACULTY) ||
+                        a.getAuthority().equals(Roles.ROLE_HOD) ||
+                        a.getAuthority().equals(Roles.ROLE_DIRECTOR) ||
+                        a.getAuthority().equals(Roles.ROLE_COLLEGE_ADMIN) ||
+                        a.getAuthority().equals(Roles.ROLE_SUPER_ADMIN));
+
+        if (!hasPermission) {
+            return ResponseEntity.status(403).body(ApiResponse.error("Forbidden: Insufficient privileges"));
+        }
+
+        EventRegistration registration = eventRegistrationRepository.findByEventId(eventId).stream()
+                .filter(r -> r.getUser().getId().equals(userId))
+                .findFirst()
+                .orElse(null);
+
+        if (registration == null)
+            return ResponseEntity.badRequest().body(ApiResponse.error("Not registered"));
 
         registration.setStatus("ATTENDED");
         eventRegistrationRepository.save(registration);
-        
+
         return ResponseEntity.ok(ApiResponse.success("Attendance marked", null));
     }
 
